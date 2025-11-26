@@ -1,18 +1,29 @@
-# Floaty Button Plugin Walkthrough
+=== Floaty Button ===
+Contributors: vizuh
+Tags: button, cta, floating, modal
+Requires at least: 6.4
+Tested up to: 6.6
+Stable tag: 1.0.0
+Requires PHP: 8.0
+License: GPLv2 or later
+License URI: https://www.gnu.org/licenses/gpl-2.0.html
 
-## Overview
+The Floaty Button plugin adds a customizable floating CTA button to your WordPress site. It can open a link in a new tab or display an iframe in a modal window while pushing a dataLayer event for tracking.
+
+== Description ==
+
 The Floaty Button plugin adds a customizable floating CTA button to your WordPress site. It can open a link in a new tab or display an iframe in a modal window while pushing a dataLayer event for tracking.
 
 **Security goal:** This plugin aims to comply with WordPress.org’s plugin guidelines and the WordPress Plugin Security Handbook, prioritizing least privilege, full input validation/sanitization, and secure use of the WordPress APIs.
 
-## Installation
+== Installation ==
 1. Place the `floaty-button` folder in your `wp-content/plugins/` directory.
 2. Activate **Floaty Button** from **Plugins** in the WordPress Admin Dashboard.
 
-## Configuration
+== Configuration ==
 Navigate to **Settings > Floaty Button** to configure the plugin.
 
-### Main Settings
+= Main Settings =
 - **Enable Plugin**: Toggle to show or hide the button globally.
 - **Button Label**: Text displayed on the button (e.g., "Book Now").
 - **Button Position**: Choose where the button appears (Bottom Right or Bottom Left).
@@ -25,7 +36,7 @@ Navigate to **Settings > Floaty Button** to configure the plugin.
 - **DataLayer Event Name**: Event name pushed to `dataLayer` on click (default: `floaty_click`).
 - **Custom CSS**: Additional CSS injected on the front end for styling overrides.
 
-### DataLayer Event
+= DataLayer Event =
 When the button is clicked, the plugin pushes an event with core metadata:
 
 ```js
@@ -36,7 +47,7 @@ When the button is clicked, the plugin pushes an event with core metadata:
 }
 ```
 
-### Customizing Styles
+= Customizing Styles =
 Use the **Custom CSS** field to override colors, spacing, or positioning. Example:
 
 ```css
@@ -49,11 +60,11 @@ Use the **Custom CSS** field to override colors, spacing, or positioning. Exampl
 }
 ```
 
-## Requirements
+== Requirements ==
 
 - WordPress 6.4 or later (tested up to 6.6)
 - PHP 8.0 or later
 
-## Licensing
+== Licensing ==
 
 Floaty Button is released under the **GPLv2 or later** license. See https://www.gnu.org/licenses/gpl-2.0.html for the full text and ensure all bundled assets remain GPL-compatible.
