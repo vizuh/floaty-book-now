@@ -1,34 +1,44 @@
-=== Floaty Button ===
-Contributors: vizuh, hugoc, Atroci, andreluizsr90
-Tags: button, cta, floating, modal, whatsapp
-Requires at least: 6.4
-Tested up to: 6.6
-Stable tag: 1.0.0
-Requires PHP: 8.0
-License: GPLv2 or later
-License URI: https://www.gnu.org/licenses/gpl-2.0.html
-
-The Floaty Button plugin adds a customizable floating CTA button to your WordPress site. It can open a link, display an iframe modal, or open a WhatsApp chat.
-
-== Description ==
-
-The Floaty Button plugin adds a customizable floating CTA button to your WordPress site. It is designed to be lightweight, secure, and easy to configure.
-
-**Features:**
-*   **Customizable Button:** Change the label, position (bottom right/left), and action.
-*   **Multiple Actions:** Open a link (new/same tab), display an iframe modal (e.g., for booking widgets), or open a WhatsApp chat.
-*   **WhatsApp Integration:** Dedicated WhatsApp template with native styling and prefilled messages.
-*   **Google Reserve Integration:** Add your Appointo Merchant ID to enable "Reserve with Google" features.
-*   **DataLayer Tracking:** Automatically pushes events to `dataLayer` for easy tracking with Google Tag Manager.
-*   **Custom CSS:** Add your own CSS directly from the settings page.
-
-**Security goal:** This plugin aims to comply with WordPress.org’s plugin guidelines and the WordPress Plugin Security Handbook, prioritizing least privilege, full input validation/sanitization, and secure use of the WordPress APIs.
+<div align="center">
+  <img src="assets/images/apointoo-logo.png" alt="Appointo Logo" width="200">
+  <h1>Floaty Button</h1>
+  <p>
+    <strong>A customizable floating CTA button for WordPress.</strong>
+  </p>
+  <p>
+    <a href="#installation">Installation</a> •
+    <a href="#configuration">Configuration</a> •
+    <a href="#features">Features</a> •
+    <a href="#licensing">Licensing</a>
+  </p>
+</div>
 
 ---
 
-**Português (Portuguese)**
+## Overview
 
-O plugin Floaty Button adiciona um botão de CTA flutuante personalizável ao seu site WordPress. Ele foi projetado para ser leve, seguro e fácil de configurar.
+The **Floaty Button** plugin adds a customizable floating CTA button to your WordPress site. It is designed to be lightweight, secure, and easy to configure. Whether you need a simple link, a booking modal, or a direct WhatsApp chat, Floaty Button handles it with style.
+
+### ✨ Features
+
+*   **🎨 Customizable Button:** Change the label, position (bottom right/left), and action.
+*   **🔗 Multiple Actions:**
+    *   Open a link (new/same tab).
+    *   Display an iframe modal (perfect for booking widgets like NexHealth, Calendly).
+    *   Open a WhatsApp chat.
+*   **💬 WhatsApp Integration:** Dedicated WhatsApp template with native styling and prefilled messages.
+*   **📅 Google Reserve Integration:** Add your Appointo Merchant ID to enable "Reserve with Google" features.
+*   **📊 DataLayer Tracking:** Automatically pushes events to `dataLayer` for easy tracking with Google Tag Manager.
+*   **💅 Custom CSS:** Add your own CSS directly from the settings page.
+
+> **Security Goal:** This plugin aims to comply with WordPress.org’s plugin guidelines and the WordPress Plugin Security Handbook, prioritizing least privilege, full input validation/sanitization, and secure use of the WordPress APIs.
+
+---
+
+<div align="center">
+  <h3>🇧🇷 Português (Portuguese)</h3>
+</div>
+
+O plugin **Floaty Button** adiciona um botão de CTA flutuante personalizável ao seu site WordPress. Ele foi projetado para ser leve, seguro e fácil de configurar.
 
 **Funcionalidades:**
 *   **Botão Personalizável:** Altere o rótulo, a posição (inferior direito/esquerdo) e a ação.
@@ -38,20 +48,25 @@ O plugin Floaty Button adiciona um botão de CTA flutuante personalizável ao se
 *   **Rastreamento DataLayer:** Envia automaticamente eventos para o `dataLayer` para fácil rastreamento com o Google Tag Manager.
 *   **CSS Personalizado:** Adicione seu próprio CSS diretamente da página de configurações.
 
-== Installation ==
+---
 
-1. Place the `floaty-button` folder in your `wp-content/plugins/` directory.
-2. Activate **Floaty Button** from **Plugins** in the WordPress Admin Dashboard.
+## 🚀 Installation
 
-**Instalação (Português)**
-1. Coloque a pasta `floaty-button` no diretório `wp-content/plugins/` do seu site.
-2. Ative o **Floaty Button** no menu **Plugins** do Painel Administrativo do WordPress.
+1.  Download the plugin folder `floaty-button`.
+2.  Place it in your `wp-content/plugins/` directory.
+3.  Activate **Floaty Button** from **Plugins** in the WordPress Admin Dashboard.
 
-== Configuration ==
+### 🇧🇷 Instalação
+1.  Coloque a pasta `floaty-button` no diretório `wp-content/plugins/` do seu site.
+2.  Ative o **Floaty Button** no menu **Plugins** do Painel Administrativo do WordPress.
+
+---
+
+## ⚙️ Configuration
 
 Navigate to **Settings > Floaty Button** to configure the plugin.
 
-= Main Settings =
+### Main Settings
 *   **Enable Plugin:** Toggle to show or hide the button globally.
 *   **Button Template:** Choose between "Default Button" or "WhatsApp Floating Button".
 *   **Button Label:** Text displayed on the button (e.g., "Book Now").
@@ -65,19 +80,21 @@ Navigate to **Settings > Floaty Button** to configure the plugin.
 *   **DataLayer Event Name:** Event name pushed to `dataLayer` on click (default: `floaty_click`).
 *   **Custom CSS:** Additional CSS injected on the front end for styling overrides.
 
-= WhatsApp Settings =
+### WhatsApp Settings
 *   **WhatsApp Phone Number:** Enter your number in international format (digits only).
 *   **Prefilled Message:** Optional message to start the conversation.
 
-= Google Reserve Integration =
+### Google Reserve Integration
 *   **Enable Google Reserve:** Toggle to enable the integration.
 *   **Merchant ID:** Enter the Merchant ID provided by Appointo.
 
-**Configuração (Português)**
+---
+
+### 🇧🇷 Configuração
 
 Navegue até **Configurações > Floaty Button** para configurar o plugin.
 
-= Configurações Principais =
+**Configurações Principais**
 *   **Habilitar Plugin:** Ative ou desative o botão globalmente.
 *   **Modelo do Botão:** Escolha entre "Botão Padrão" ou "Botão Flutuante WhatsApp".
 *   **Rótulo do Botão:** Texto exibido no botão (ex: "Agendar Agora").
@@ -91,15 +108,17 @@ Navegue até **Configurações > Floaty Button** para configurar o plugin.
 *   **Nome do Evento DataLayer:** Nome do evento enviado ao `dataLayer` no clique (padrão: `floaty_click`).
 *   **CSS Personalizado:** CSS adicional injetado no front-end para substituições de estilo.
 
-= Configurações do WhatsApp =
+**Configurações do WhatsApp**
 *   **Número de Telefone WhatsApp:** Digite seu número no formato internacional (apenas dígitos).
 *   **Mensagem Pré-preenchida:** Mensagem opcional para iniciar a conversa.
 
-= Integração Google Reserve =
+**Integração Google Reserve**
 *   **Habilitar Google Reserve:** Ative para habilitar a integração.
 *   **Merchant ID:** Insira o Merchant ID fornecido pelo Appointo.
 
-== DataLayer Event ==
+---
+
+## 📊 DataLayer Event
 
 When the button is clicked, the plugin pushes an event with core metadata:
 
@@ -111,7 +130,9 @@ When the button is clicked, the plugin pushes an event with core metadata:
 }
 ```
 
-== Customizing Styles ==
+---
+
+## 🎨 Customizing Styles
 
 Use the **Custom CSS** field to override colors, spacing, or positioning. Example:
 
@@ -125,11 +146,17 @@ Use the **Custom CSS** field to override colors, spacing, or positioning. Exampl
 }
 ```
 
-== Requirements ==
+---
+
+## 📋 Requirements
 
 *   WordPress 6.4 or later (tested up to 6.6)
 *   PHP 8.0 or later
 
-== Licensing ==
+---
 
-Floaty Button is released under the **GPLv2 or later** license. See https://www.gnu.org/licenses/gpl-2.0.html for the full text and ensure all bundled assets remain GPL-compatible.
+## 📄 Licensing
+
+Floaty Button is released under the **GPLv2 or later** license. See [GNU Licenses](https://www.gnu.org/licenses/gpl-2.0.html) for the full text.
+
+**Contributors:** vizuh, hugoc, Atroci, andreluizsr90
