@@ -25,6 +25,7 @@ class Floaty_Button_Plugin {
                 add_action( 'admin_init', array( $this, 'register_settings' ) );
                 add_action( 'admin_menu', array( $this, 'add_settings_page' ) );
                 add_action( 'wp_enqueue_scripts', array( $this, 'enqueue_scripts' ), 20 );
+                add_action( 'wp_head', array( $this, 'print_custom_css' ), 100 );
         }
 
 	public function load_textdomain() {
@@ -253,7 +254,7 @@ class Floaty_Button_Plugin {
 
 		$output['iframe_url']    = esc_url_raw( $input['iframe_url'] ?? '' );
 		$output['event_name']    = sanitize_key( $input['event_name'] ?? 'floaty_click' );
-                $output['custom_css']    = wp_strip_all_tags( $input['custom_css'] ?? '' );
+                $output['custom_css']    = wp_kses( $input['custom_css'] ?? '', array() );
                 $output['whatsapp_phone']   = preg_replace( '/[^0-9]/', '', $input['whatsapp_phone'] ?? '' );
                 $output['whatsapp_message'] = sanitize_text_field( $input['whatsapp_message'] ?? '' );
 
@@ -368,9 +369,9 @@ class Floaty_Button_Plugin {
 			'1.0.0'
 		);
 
-		if ( ! empty( $options['custom_css'] ) ) {
-			wp_add_inline_style( 'floaty-button', $options['custom_css'] );
-		}
+                if ( ! empty( $options['custom_css'] ) ) {
+                        wp_add_inline_style( 'floaty-button', $options['custom_css'] );
+                }
 
 		$config = array(
 			'buttonLabel'     => $options['button_label'] ?? 'Book now',
@@ -391,7 +392,20 @@ class Floaty_Button_Plugin {
 
 		wp_localize_script( 'floaty-button', 'FLOATY_BUTTON_SETTINGS', $config );
             wp_enqueue_script( 'floaty-button' );
-	}
+        }
+
+        /**
+         * Print custom CSS late in the head to make user overrides harder to trump.
+         */
+        public function print_custom_css() {
+                $options = get_option( self::OPTION_KEY );
+
+                if ( empty( $options['enabled'] ) || empty( $options['custom_css'] ) ) {
+                        return;
+                }
+
+                echo '<style id="floaty-button-custom-css">' . wp_kses( $options['custom_css'], array() ) . '</style>';
+        }
 }
 
 new Floaty_Button_Plugin();
