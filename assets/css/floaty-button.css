@@ -92,45 +92,113 @@
 }
 
 /* WhatsApp Button Styles */
-.floaty-whatsapp-btn {
-  position: fixed;
-  bottom: 20px;
-  width: 56px;
-  height: 56px;
-  border-radius: 50%;
-  background-color: #25D366; /* WhatsApp green */
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.25);
-  text-decoration: none;
-  z-index: 9999;
-  transition: transform 0.15s ease, box-shadow 0.15s ease;
-  border: none;
-  cursor: pointer;
+#floaty-button-container {
+  --floaty-whatsapp-size: clamp(58px, 4vw + 44px, 66px);
+  --floaty-whatsapp-bg: #25d366;
+  --floaty-whatsapp-bg-highlight: #1fb156;
+  --floaty-whatsapp-shadow: 0 12px 28px rgba(0, 0, 0, 0.2), 0 2px 6px rgba(0, 0, 0, 0.12);
+  --floaty-whatsapp-shadow-hover: 0 14px 34px rgba(0, 0, 0, 0.28), 0 4px 10px rgba(0, 0, 0, 0.18);
+  --floaty-whatsapp-focus-ring: 0 0 0 3px #e9fbf2, 0 0 0 6px rgba(0, 0, 0, 0.12);
+  --floaty-whatsapp-transition: 0.18s ease;
 }
 
-.floaty-whatsapp-btn.floaty-position-bottom_right {
+#floaty-button-container .floaty-whatsapp-btn {
+  position: fixed;
+  bottom: 20px;
+  width: var(--floaty-whatsapp-size);
+  height: var(--floaty-whatsapp-size);
+  border-radius: 50%;
+  background: radial-gradient(circle at 30% 30%, rgba(255, 255, 255, 0.12), transparent 45%),
+    var(--floaty-whatsapp-bg);
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  box-shadow: var(--floaty-whatsapp-shadow);
+  text-decoration: none;
+  z-index: 9999;
+  transition: transform var(--floaty-whatsapp-transition), box-shadow var(--floaty-whatsapp-transition);
+  border: none;
+  cursor: pointer;
+  touch-action: manipulation;
+}
+
+#floaty-button-container .floaty-whatsapp-btn.floaty-position-bottom_right {
     right: 20px;
 }
 
-.floaty-whatsapp-btn.floaty-position-bottom_left {
+#floaty-button-container .floaty-whatsapp-btn.floaty-position-bottom_left {
     left: 20px;
 }
 
-.floaty-whatsapp-btn:hover,
-.floaty-whatsapp-btn:focus {
-  transform: translateY(-2px);
-  box-shadow: 0 6px 16px rgba(0, 0, 0, 0.3);
+#floaty-button-container .floaty-whatsapp-btn:hover,
+#floaty-button-container .floaty-whatsapp-btn:focus-visible {
+  transform: translateY(-2px) scale(1.02);
+  box-shadow: var(--floaty-whatsapp-shadow-hover);
 }
 
-.floaty-whatsapp-btn:focus {
-  outline: 2px solid #fff;
-  outline-offset: 3px;
+#floaty-button-container .floaty-whatsapp-btn:active {
+  transform: translateY(0);
+  box-shadow: var(--floaty-whatsapp-shadow);
+  background: var(--floaty-whatsapp-bg);
 }
 
-.floaty-whatsapp-icon svg {
-  width: 26px;
-  height: 26px;
+#floaty-button-container .floaty-whatsapp-btn:focus-visible {
+  outline: none;
+  box-shadow: var(--floaty-whatsapp-shadow-hover), var(--floaty-whatsapp-focus-ring);
+}
+
+#floaty-button-container .floaty-whatsapp-btn:focus:not(:focus-visible) {
+  outline: none;
+}
+
+#floaty-button-container .floaty-whatsapp-btn::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  border-radius: 50%;
+  background: radial-gradient(circle at 70% 30%, rgba(255, 255, 255, 0.16), transparent 50%);
+  mix-blend-mode: screen;
+  opacity: 0.9;
+  pointer-events: none;
+}
+
+#floaty-button-container .floaty-whatsapp-icon svg {
+  width: calc(var(--floaty-whatsapp-size) * 0.46);
+  height: calc(var(--floaty-whatsapp-size) * 0.46);
   fill: #ffffff;
+  display: block;
+  transform: translateZ(0);
+}
+
+#floaty-button-container .floaty-whatsapp-btn.floaty-whatsapp-btn--pulse::after {
+  content: "";
+  position: absolute;
+  inset: -6px;
+  border-radius: 50%;
+  border: 2px solid rgba(37, 211, 102, 0.35);
+  opacity: 0;
+  transform: scale(0.85);
+  transition: opacity var(--floaty-whatsapp-transition), transform 0.3s ease;
+}
+
+#floaty-button-container .floaty-whatsapp-btn.floaty-whatsapp-btn--pulse:hover::after,
+#floaty-button-container .floaty-whatsapp-btn.floaty-whatsapp-btn--pulse:focus-visible::after {
+  opacity: 1;
+  transform: scale(1.05);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  #floaty-button-container .floaty-whatsapp-btn {
+    transition: none;
+  }
+
+  #floaty-button-container .floaty-whatsapp-btn:hover,
+  #floaty-button-container .floaty-whatsapp-btn:focus-visible {
+    transform: none;
+    box-shadow: var(--floaty-whatsapp-shadow);
+  }
+
+  #floaty-button-container .floaty-whatsapp-btn.floaty-whatsapp-btn--pulse::after {
+    transition: none;
+  }
 }
