@@ -2,7 +2,7 @@
 /**
  * Frontend rendering.
  *
- * @package FloatyButton
+ * @package FloatyBookNowChat
  */
 
 if ( ! defined( 'ABSPATH' ) ) {
