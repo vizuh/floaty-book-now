@@ -1,14 +1,22 @@
-# Floaty Button
+# Floaty Book Now Chat
 
-A lightweight, customizable floating call-to-action button for WordPress sites.
+A lightweight, customizable floating call-to-action button for WordPress sites that can launch booking flows or start a WhatsApp chat.
 
 > WordPress.org listing: **coming soon** – add the link here as soon as the plugin is published.
 
 ---
 
+## Naming and packaging (slug alignment)
+
+- GitHub repo name (recommended): `floaty-book-now-chat` (alternatives: `floaty-book-now-button`, `vzflty-floaty` if you need the prefix visible).
+- WordPress plugin folder: `floaty-book-now-chat/`.
+- Plugin ZIP filename: `floaty-book-now-chat.zip`.
+- Main plugin file: `floaty-book-now-chat.php`.
+- Text domain: `floaty-book-now-chat` to keep the slug, folder, and translations aligned.
+
 ## What it does
 
-Floaty Button adds a persistent floating button to your WordPress pages. You can point it to an external URL, open a booking experience inside an iframe modal, or start a WhatsApp conversation—all while keeping the footprint small, accessible, and easy to configure.
+Floaty Book Now Chat adds a persistent floating button to your WordPress pages. You can point it to an external URL, open a booking experience inside an iframe modal, or start a WhatsApp conversation—all while keeping the footprint small, accessible, and easy to configure.
 
 ## Key features
 
@@ -29,15 +37,15 @@ Floaty Button adds a persistent floating button to your WordPress pages. You can
 
 ## Installation
 
-1. Download or clone this repository and copy the `floaty-button` folder into `wp-content/plugins/`.
-2. From **WordPress Admin → Plugins**, activate **Floaty Button**.
-3. Open **Settings → Floaty Button** to configure the button.
+1. Download or clone this repository and copy the `floaty-book-now-chat` folder into `wp-content/plugins/`.
+2. From **WordPress Admin → Plugins**, activate **Floaty Book Now Chat**.
+3. Open **Settings → Floaty Book Now Chat** to configure the button.
 
 > Optional: add screenshots or a short GIF here that shows the button on the front end and the admin settings page.
 
 ## Configuration
 
-All options live under **Settings → Floaty Button** with three tabs: **General**, **WhatsApp**, and **Apointoo Booking**.
+All options live under **Settings → Floaty Book Now Chat** with three tabs: **General**, **WhatsApp**, and **Apointoo Booking**.
 
 ### General tab
 
@@ -67,7 +75,7 @@ All options live under **Settings → Floaty Button** with three tabs: **General
 
 **Does the plugin add its own styling?**  Yes. It ships with lightweight styles for the default and WhatsApp templates, plus a Custom CSS field so you can override anything without editing theme files.
 
-**What does the DataLayer event look like?**  On click, Floaty Button pushes `{ event: '<your_event_name>', floatyActionType: 'link' | 'iframe_modal' | 'whatsapp', floatyLabel: '<label>' }` to `window.dataLayer` if it exists.
+**What does the DataLayer event look like?**  On click, Floaty Book Now Chat pushes `{ event: '<your_event_name>', floatyActionType: 'link' | 'iframe_modal' | 'whatsapp', floatyLabel: '<label>' }` to `window.dataLayer` if it exists.
 
 **How do I disable the button temporarily?**  Toggle **Enable plugin** off in the General tab; settings are preserved for when you re-enable it.
 
@@ -77,13 +85,13 @@ All options live under **Settings → Floaty Button** with three tabs: **General
 
 ### Local install steps
 
-1. Clone the repo into `wp-content/plugins/floaty-button` (or symlink it from your plugin workspace).
-2. Activate **Floaty Button** from the Plugins screen.
+1. Clone the repo into `wp-content/plugins/floaty-book-now-chat` (or symlink it from your plugin workspace).
+2. Activate **Floaty Book Now Chat** from the Plugins screen.
 3. There is no build step—PHP and asset files are ready to run. Clear any page cache after updates.
 
 ### Project structure
 
-- `floaty.php`: Plugin bootstrap and hooks.
+- `floaty-book-now-chat.php`: Plugin bootstrap and hooks.
 - `includes/admin/`: Settings page, tabs, and sanitization.
 - `includes/frontend/`: Front-end rendering and assets enqueueing.
 - `includes/helpers.php`: Shared helpers and defaults.

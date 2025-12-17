@@ -2,7 +2,7 @@
 /**
  * Core plugin wiring.
  *
- * @package FloatyButton
+ * @package FloatyBookNowChat
  */
 
 if ( ! defined( 'ABSPATH' ) ) {
@@ -34,6 +34,12 @@ class VZFLTY_Plugin {
 	 * @return void
 	 */
 	public function init() {
+		load_plugin_textdomain(
+			'floaty-book-now-chat',
+			false,
+			dirname( plugin_basename( VZFLTY_PLUGIN_FILE ) ) . '/languages'
+		);
+
 		$this->frontend = new VZFLTY_Frontend();
 		add_action( 'wp_enqueue_scripts', array( $this->frontend, 'enqueue_assets' ) );
 
@@ -58,7 +64,7 @@ class VZFLTY_Plugin {
 		$settings_link = sprintf(
 			'<a href="%s">%s</a>',
 			esc_url( $url ),
-			esc_html__( 'Settings', 'floaty-button' )
+			esc_html__( 'Settings', 'floaty-book-now-chat' )
 		);
 
 		array_unshift( $links, $settings_link );
@@ -76,14 +82,14 @@ class VZFLTY_Plugin {
 	public static function activate() {
 		$new_options = get_option( VZFLTY_OPTION_KEY, array() );
 
-		if ( ! empty( $new_options ) ) {
-			return;
-		}
+		if ( empty( $new_options ) ) {
+			$legacy_options = get_option( 'floaty_button_options', array() );
 
-		$legacy_options = get_option( 'floaty_button_options', array() );
-
-		if ( ! empty( $legacy_options ) ) {
-			update_option( VZFLTY_OPTION_KEY, $legacy_options );
+			if ( ! empty( $legacy_options ) ) {
+				update_option( VZFLTY_OPTION_KEY, $legacy_options );
+			} else {
+				add_option( VZFLTY_OPTION_KEY, vzflty_get_default_options() );
+			}
 		}
 	}
 }
