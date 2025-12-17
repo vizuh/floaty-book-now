@@ -2,7 +2,7 @@
 /**
  * Admin area logic.
  *
- * @package FloatyButton
+ * @package FloatyBookNowChat
  */
 
 if ( ! defined( 'ABSPATH' ) ) {
@@ -77,8 +77,8 @@ class VZFLTY_Admin {
 	 */
 	public function add_settings_page() {
 		add_options_page(
-			__( 'Floaty Settings', 'floaty-button' ),
-			__( 'Floaty', 'floaty-button' ),
+			__( 'Floaty Book Now Chat Settings', 'floaty-book-now-chat' ),
+			__( 'Floaty Book Now Chat', 'floaty-book-now-chat' ),
 			'manage_options',
 			self::PAGE_SLUG,
 			array( $this, 'render_settings_page' )
@@ -101,19 +101,23 @@ class VZFLTY_Admin {
 		$tab_definitions = $this->get_tab_definitions();
 		?>
 		<div class="wrap">
-			<h1><?php esc_html_e( 'Floaty Settings', 'floaty-button' ); ?></h1>
-
+			<h1><?php esc_html_e( 'Floaty Book Now Chat Settings', 'floaty-book-now-chat' ); ?></h1>
 			<h2 class="nav-tab-wrapper">
 				<?php foreach ( $tab_definitions as $tab_key => $tab_data ) : ?>
 					<?php
 					$tab_url = $this->get_tab_url( $tab_data['slug'] );
 					$is_active = ( $active_tab === $tab_data['slug'] );
 					?>
-					<a
-						href="<?php echo esc_url( $tab_url ); ?>"
-						class="nav-tab<?php echo esc_attr( $is_active ? ' nav-tab-active' : '' ); ?>"
-					>
-						<?php echo esc_html( $tab_data['label'] ); ?>
+					<a href="<?php echo esc_url( $tab_url ); ?>" class="nav-tab<?php echo esc_attr( $active_tab === $tab_slug ? ' nav-tab-active' : '' ); ?>">
+						<?php
+						if ( 'general' === $tab_slug ) {
+							esc_html_e( 'General', 'floaty-book-now-chat' );
+						} elseif ( 'whatsapp' === $tab_slug ) {
+							esc_html_e( 'WhatsApp', 'floaty-book-now-chat' );
+						} else {
+							esc_html_e( 'Apointoo Booking', 'floaty-book-now-chat' );
+						}
+						?>
 					</a>
 				<?php endforeach; ?>
 			</h2>
@@ -185,14 +189,14 @@ class VZFLTY_Admin {
 
 		add_settings_section(
 			'vzflty_settings_general',
-			__( 'General', 'floaty-button' ),
+			__( 'General', 'floaty-book-now-chat' ),
 			null,
 			$page_id
 		);
 
 		add_settings_field(
 			'enabled',
-			__( 'Enable plugin', 'floaty-button' ),
+			__( 'Enable plugin', 'floaty-book-now-chat' ),
 			array( $this, 'render_checkbox_field' ),
 			$page_id,
 			'vzflty_settings_general',
@@ -203,27 +207,27 @@ class VZFLTY_Admin {
 
 		add_settings_field(
 			'button_label',
-			__( 'Button label', 'floaty-button' ),
+			__( 'Button label', 'floaty-book-now-chat' ),
 			array( $this, 'render_text_field' ),
 			$page_id,
 			'vzflty_settings_general',
 			array(
 				'key'     => 'button_label',
-				'default' => __( 'Book now', 'floaty-button' ),
+				'default' => __( 'Book now', 'floaty-book-now-chat' ),
 			)
 		);
 
 		add_settings_field(
 			'position',
-			__( 'Button position', 'floaty-button' ),
+			__( 'Button position', 'floaty-book-now-chat' ),
 			array( $this, 'render_select_field' ),
 			$page_id,
 			'vzflty_settings_general',
 			array(
 				'key'     => 'position',
 				'options' => array(
-					'bottom_right' => __( 'Bottom right', 'floaty-button' ),
-					'bottom_left'  => __( 'Bottom left', 'floaty-button' ),
+					'bottom_right' => __( 'Bottom right', 'floaty-book-now-chat' ),
+					'bottom_left'  => __( 'Bottom left', 'floaty-book-now-chat' ),
 				),
 				'default' => 'bottom_right',
 			)
@@ -231,15 +235,15 @@ class VZFLTY_Admin {
 
 		add_settings_field(
 			'action_type',
-			__( 'Action type', 'floaty-button' ),
+			__( 'Action type', 'floaty-book-now-chat' ),
 			array( $this, 'render_select_field' ),
 			$page_id,
 			'vzflty_settings_general',
 			array(
 				'key'     => 'action_type',
 				'options' => array(
-					'link'         => __( 'Open link', 'floaty-button' ),
-					'iframe_modal' => __( 'Open iframe modal', 'floaty-button' ),
+					'link'         => __( 'Open link', 'floaty-book-now-chat' ),
+					'iframe_modal' => __( 'Open iframe modal', 'floaty-book-now-chat' ),
 				),
 				'default' => 'link',
 			)
@@ -247,27 +251,27 @@ class VZFLTY_Admin {
 
 		add_settings_field(
 			'link_url',
-			__( 'Link URL', 'floaty-button' ),
+			__( 'Link URL', 'floaty-book-now-chat' ),
 			array( $this, 'render_text_field' ),
 			$page_id,
 			'vzflty_settings_general',
 			array(
 				'key'         => 'link_url',
-				'description' => __( 'Used when action type is set to link.', 'floaty-button' ),
+				'description' => __( 'Used when action type is set to link.', 'floaty-book-now-chat' ),
 			)
 		);
 
 		add_settings_field(
 			'link_target',
-			__( 'Link target', 'floaty-button' ),
+			__( 'Link target', 'floaty-book-now-chat' ),
 			array( $this, 'render_select_field' ),
 			$page_id,
 			'vzflty_settings_general',
 			array(
 				'key'     => 'link_target',
 				'options' => array(
-					'_blank' => __( 'New tab (_blank)', 'floaty-button' ),
-					'_self'  => __( 'Same tab (_self)', 'floaty-button' ),
+					'_blank' => __( 'New tab (_blank)', 'floaty-book-now-chat' ),
+					'_self'  => __( 'Same tab (_self)', 'floaty-book-now-chat' ),
 				),
 				'default' => '_blank',
 			)
@@ -275,19 +279,19 @@ class VZFLTY_Admin {
 
 		add_settings_field(
 			'iframe_url',
-			__( 'Iframe URL', 'floaty-button' ),
+			__( 'Iframe URL', 'floaty-book-now-chat' ),
 			array( $this, 'render_text_field' ),
 			$page_id,
 			'vzflty_settings_general',
 			array(
 				'key'         => 'iframe_url',
-				'description' => __( 'Used when action type is set to iframe modal.', 'floaty-button' ),
+				'description' => __( 'Used when action type is set to iframe modal.', 'floaty-book-now-chat' ),
 			)
 		);
 
 		add_settings_field(
 			'event_name',
-			__( 'DataLayer event name', 'floaty-button' ),
+			__( 'DataLayer event name', 'floaty-book-now-chat' ),
 			array( $this, 'render_text_field' ),
 			$page_id,
 			'vzflty_settings_general',
@@ -299,13 +303,13 @@ class VZFLTY_Admin {
 
 		add_settings_field(
 			'custom_css',
-			__( 'Custom CSS', 'floaty-button' ),
+			__( 'Custom CSS', 'floaty-book-now-chat' ),
 			array( $this, 'render_textarea_field' ),
 			$page_id,
 			'vzflty_settings_general',
 			array(
 				'key'         => 'custom_css',
-				'description' => __( 'Scope your rules with #vzflty-button-container to avoid theme conflicts.', 'floaty-button' ),
+				'description' => __( 'Scope your rules with #floaty-button-container to avoid theme conflicts.', 'floaty-book-now-chat' ),
 			)
 		);
 	}
@@ -320,22 +324,22 @@ class VZFLTY_Admin {
 
 		add_settings_section(
 			'vzflty_settings_whatsapp',
-			__( 'WhatsApp', 'floaty-button' ),
+			__( 'WhatsApp', 'floaty-book-now-chat' ),
 			null,
 			$page_id
 		);
 
 		add_settings_field(
 			'button_template',
-			__( 'Button template', 'floaty-button' ),
+			__( 'Button template', 'floaty-book-now-chat' ),
 			array( $this, 'render_select_field' ),
 			$page_id,
 			'vzflty_settings_whatsapp',
 			array(
 				'key'     => 'button_template',
 				'options' => array(
-					'default'  => __( 'Default button', 'floaty-button' ),
-					'whatsapp' => __( 'WhatsApp floating button', 'floaty-button' ),
+					'default'  => __( 'Default button', 'floaty-book-now-chat' ),
+					'whatsapp' => __( 'WhatsApp floating button', 'floaty-book-now-chat' ),
 				),
 				'default' => 'default',
 			)
@@ -343,25 +347,25 @@ class VZFLTY_Admin {
 
 		add_settings_field(
 			'whatsapp_phone',
-			__( 'WhatsApp phone number', 'floaty-button' ),
+			__( 'WhatsApp phone number', 'floaty-book-now-chat' ),
 			array( $this, 'render_text_field' ),
 			$page_id,
 			'vzflty_settings_whatsapp',
 			array(
 				'key'         => 'whatsapp_phone',
-				'description' => __( 'Use the full international format with digits only. Example: 5511999999999.', 'floaty-button' ),
+				'description' => __( 'Use the full international format with digits only. Example: 5511999999999.', 'floaty-book-now-chat' ),
 			)
 		);
 
 		add_settings_field(
 			'whatsapp_message',
-			__( 'Prefilled message', 'floaty-button' ),
+			__( 'Prefilled message', 'floaty-book-now-chat' ),
 			array( $this, 'render_text_field' ),
 			$page_id,
 			'vzflty_settings_whatsapp',
 			array(
 				'key'         => 'whatsapp_message',
-				'description' => __( 'Optional message shown when the chat opens.', 'floaty-button' ),
+				'description' => __( 'Optional message shown when the chat opens.', 'floaty-book-now-chat' ),
 			)
 		);
 	}
@@ -376,14 +380,14 @@ class VZFLTY_Admin {
 
 		add_settings_section(
 			'vzflty_settings_apointoo',
-			__( 'Apointoo Booking', 'floaty-button' ),
+			__( 'Apointoo Booking', 'floaty-book-now-chat' ),
 			null,
 			$page_id
 		);
 
 		add_settings_field(
 			'apointoo_enabled',
-			__( 'Enable Apointoo booking integration', 'floaty-button' ),
+			__( 'Enable Apointoo booking integration', 'floaty-book-now-chat' ),
 			array( $this, 'render_checkbox_field' ),
 			$page_id,
 			'vzflty_settings_apointoo',
@@ -394,13 +398,13 @@ class VZFLTY_Admin {
 
 		add_settings_field(
 			'apointoo_merchant_id',
-			__( 'Merchant ID', 'floaty-button' ),
+			__( 'Merchant ID', 'floaty-book-now-chat' ),
 			array( $this, 'render_text_field' ),
 			$page_id,
 			'vzflty_settings_apointoo',
 			array(
 				'key'         => 'apointoo_merchant_id',
-				'description' => __( 'Displays booking button flow for Google Search/Maps where available via Apointoo.', 'floaty-button' ),
+				'description' => __( 'Displays booking button flow for Google Search/Maps where available via Apointoo.', 'floaty-book-now-chat' ),
 			)
 		);
 	}
@@ -498,17 +502,17 @@ class VZFLTY_Admin {
 		$options = $this->get_options();
 
 		if ( 'general' === $active_tab ) {
-			$status_label = ! empty( $options['enabled'] ) ? __( 'Enabled', 'floaty-button' ) : __( 'Disabled', 'floaty-button' );
+			$status_label = ! empty( $options['enabled'] ) ? __( 'Enabled', 'floaty-book-now-chat' ) : __( 'Disabled', 'floaty-book-now-chat' );
 			printf(
 				'<p class="description"><strong>%s</strong> %s</p>',
-				esc_html__( 'Status:', 'floaty-button' ),
+				esc_html__( 'Status:', 'floaty-book-now-chat' ),
 				esc_html( $status_label )
 			);
 
 			if ( 'link' === $options['action_type'] && 'whatsapp' !== $options['button_template'] && empty( $options['link_url'] ) ) {
 				printf(
 					'<div class="notice notice-warning"><p>%s</p></div>',
-					esc_html__( 'Add a link URL to make the button work when using the link action.', 'floaty-button' )
+					esc_html__( 'Add a link URL to make the button work when using the link action.', 'floaty-book-now-chat' )
 				);
 			}
 		}
@@ -516,7 +520,7 @@ class VZFLTY_Admin {
 		if ( 'whatsapp' === $active_tab && 'whatsapp' === $options['button_template'] && empty( $options['whatsapp_phone'] ) ) {
 			printf(
 				'<div class="notice notice-warning"><p>%s</p></div>',
-				esc_html__( 'Enter a WhatsApp phone number to display the WhatsApp floating button.', 'floaty-button' )
+				esc_html__( 'Enter a WhatsApp phone number to display the WhatsApp floating button.', 'floaty-book-now-chat' )
 			);
 		}
 	}

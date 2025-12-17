@@ -2,7 +2,7 @@
 /**
  * Core plugin wiring.
  *
- * @package FloatyButton
+ * @package FloatyBookNowChat
  */
 
 if ( ! defined( 'ABSPATH' ) ) {
@@ -64,7 +64,7 @@ class VZFLTY_Plugin {
 		$settings_link = sprintf(
 			'<a href="%s">%s</a>',
 			esc_url( $url ),
-			esc_html__( 'Settings', 'floaty-button' )
+			esc_html__( 'Settings', 'floaty-book-now-chat' )
 		);
 
 		array_unshift( $links, $settings_link );

@@ -1,19 +1,19 @@
 <?php
 /**
- * Plugin Name: Floaty Button
- * Plugin URI:  https://github.com/vizuh/floaty-button
- * Description: Floaty button
+ * Plugin Name: Floaty Book Now Chat
+ * Plugin URI:  https://github.com/vizuh/floaty-book-now-chat
+ * Description: Floating “book now” and WhatsApp chat button with modal support.
  * Version:     1.0.0
  * Author:      Vizuh
  * Author URI:  https://vizuh.com
- * Text Domain: floaty-button
+ * Text Domain: floaty-book-now-chat
  * Requires at least: 6.4
  * Tested up to: 6.9
  * Requires PHP: 7.4
  * License:     GPLv2 or later
  * License URI: https://www.gnu.org/licenses/gpl-2.0.html
  *
- * @package FloatyButton
+ * @package FloatyBookNowChat
  */
 
 if ( ! defined( 'ABSPATH' ) ) {
