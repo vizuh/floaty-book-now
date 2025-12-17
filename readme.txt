@@ -1,6 +1,6 @@
-=== Floaty Book Now Chat ===
-Contributors: vizuh, hugoc, andreluizsr90, atroci
-Tags: booking, call to action, whatsapp, chat, button
+=== Floaty – Book Now & Chat Button ===
+Contributors: vizuh, hugoc, atroci, andreluizsr90
+Tags: booking, appointments, whatsapp, chat, floating button, cta, modal
 Requires at least: 6.4
 Tested up to: 6.9
 Requires PHP: 7.4
@@ -8,37 +8,67 @@ Stable tag: 1.0.0
 License: GPLv2 or later
 License URI: https://www.gnu.org/licenses/gpl-2.0.html
 
-Floating “book now” and WhatsApp chat button with optional iframe modal and GTM-ready click events.
+Lightweight floating “Book Now” button + WhatsApp chat. Open a link, launch a modal, and track clicks via dataLayer.
 
 == Description ==
-Floaty Book Now Chat adds a lightweight floating call-to-action button that can open a link, launch an iframe modal for booking widgets, or start a WhatsApp chat with an optional prefilled message. Configure label, position, link targets, DataLayer event names, and Apointoo Merchant ID from a single settings page.
+
+Floaty adds a clean floating call-to-action button to your site so visitors can **book faster** or **start a WhatsApp chat**—without digging through menus.
+
+Choose your mode:
+* WhatsApp mode: click-to-chat with optional prefilled message
+* Custom mode: open a link or launch an iframe modal (great for booking widgets)
+
+= Key Features =
+* Floating CTA on every page (bottom-left / bottom-right)
+* Modes: WhatsApp or Custom
+* Custom mode actions: open link or iframe modal
+* dataLayer click event for GTM/GA4 tracking
+* Custom CSS field for quick styling overrides
+* Lean, WordPress-native settings UI
+
+= Apointoo Booking (Optional) =
+If you use Apointoo, Floaty includes an optional integration tab for booking configuration used in Google Search/Maps booking flows where available via your provider setup.
+
+Need a Merchant ID? Email support@vizuh.com.
+
+Note: Booking visibility on Google Search/Maps depends on eligibility and provider setup.
 
 == Installation ==
-1. Upload the `floaty-book-now-chat` folder to the `/wp-content/plugins/` directory or install via the Plugins screen.
-2. Activate **Floaty Book Now Chat** through the **Plugins** menu.
-3. Go to **Settings → Floaty Book Now Chat** to configure the button.
+
+1. Upload the plugin folder to the `/wp-content/plugins/` directory, or install via the WordPress Plugins screen.
+2. Activate the plugin through the 'Plugins' screen.
+3. Go to Settings → Floaty.
+4. Enable Floaty and choose your mode (WhatsApp or Custom).
 
 == Frequently Asked Questions ==
-= Where do I change the button text or action? =
-All options are in **Settings → Floaty Book Now Chat** under the General, WhatsApp, and Apointoo tabs.
 
-= Does it support WhatsApp without a link URL? =
-Yes. Choose the WhatsApp template and enter a phone number (international format) and optional prefilled message.
+= Can I use Floaty without WhatsApp? =
+Yes. Use Custom mode to open a link or iframe modal.
 
-= How do I embed a booking widget in a modal? =
-Set **Action type** to **Open iframe modal** and paste the iframe URL. The modal loads your booking widget in place.
+= Can I use Floaty without Apointoo? =
+Yes. The Apointoo tab is optional.
 
-= Does it emit a Google Tag Manager event? =
-Yes. On click it pushes a DataLayer event name of your choice (default `floaty_click`) along with the action type and label.
+= Does Floaty guarantee booking visibility on Google Search/Maps? =
+No. That depends on eligibility and provider setup. Floaty provides the on-site CTA and integration settings.
+
+= What does the dataLayer event look like? =
+Floaty pushes an event to `window.dataLayer` (if present):
+`event`, `floatyActionType`, and `floatyLabel`.
 
 == Screenshots ==
-1. Front-end floating button examples (default and WhatsApp templates).
-2. Settings screen showing General, WhatsApp, and Apointoo tabs.
+
+1. General tab (enable, label, position, mode, event name)
+2. WhatsApp tab (phone + prefilled message)
+3. Custom tab (link/modal + URL fields + custom CSS)
+4. Apointoo Booking tab (enable + Merchant ID)
+5. Frontend example (floating button on a page)
 
 == Changelog ==
+
 = 1.0.0 =
 * Initial release.
 
 == Upgrade Notice ==
+
 = 1.0.0 =
-First public release with booking link, iframe modal, and WhatsApp options.
+Initial release.
