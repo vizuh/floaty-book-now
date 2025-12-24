@@ -69,6 +69,7 @@ class VZFLTY_Admin {
 		$this->register_whatsapp_section();
 		$this->register_custom_section();
 		$this->register_apointoo_section();
+		$this->register_gtm_section();
 	}
 
 	/**
@@ -232,6 +233,36 @@ class VZFLTY_Admin {
 
 		if ( array_key_exists( 'apointoo_merchant_id', $input ) ) {
 			$output['apointoo_merchant_id'] = sanitize_text_field( $input['apointoo_merchant_id'] );
+		}
+
+		// Device targeting.
+		if ( array_key_exists( 'show_on_desktop', $input ) ) {
+			$output['show_on_desktop'] = ! empty( $input['show_on_desktop'] ) ? 1 : 0;
+		}
+
+		if ( array_key_exists( 'show_on_mobile', $input ) ) {
+			$output['show_on_mobile'] = ! empty( $input['show_on_mobile'] ) ? 1 : 0;
+		}
+
+		// Page targeting.
+		if ( array_key_exists( 'page_targeting', $input ) ) {
+			$output['page_targeting'] = in_array( $input['page_targeting'], array( 'all', 'homepage', 'specific' ), true ) ? $input['page_targeting'] : $current_values['page_targeting'];
+		}
+
+		if ( array_key_exists( 'target_pages', $input ) && is_array( $input['target_pages'] ) ) {
+			$output['target_pages'] = array_map( 'absint', $input['target_pages'] );
+		} elseif ( ! array_key_exists( 'target_pages', $input ) ) {
+			// Checkbox not checked, reset to empty array.
+			$output['target_pages'] = array();
+		}
+
+		// GTM DataLayer.
+		if ( array_key_exists( 'gtm_enabled', $input ) ) {
+			$output['gtm_enabled'] = ! empty( $input['gtm_enabled'] ) ? 1 : 0;
+		}
+
+		if ( array_key_exists( 'gtm_event_name', $input ) ) {
+			$output['gtm_event_name'] = sanitize_key( $input['gtm_event_name'] );
 		}
 
 		return $output;
@@ -580,6 +611,57 @@ class VZFLTY_Admin {
 	}
 
 	/**
+	 * Register the GTM tab fields.
+	 *
+	 * @return void
+	 */
+	private function register_gtm_section() {
+		$page_id = $this->get_section_page_id( 'gtm' );
+
+		add_settings_section(
+			'vzflty_settings_gtm',
+			__( 'Google Tag Manager', 'floaty-book-now-chat' ),
+			array( $this, 'render_gtm_section_description' ),
+			$page_id
+		);
+
+		add_settings_field(
+			'gtm_enabled',
+			__( 'Enable GTM DataLayer', 'floaty-book-now-chat' ),
+			array( $this, 'render_checkbox_field' ),
+			$page_id,
+			'vzflty_settings_gtm',
+			array(
+				'key' => 'gtm_enabled',
+			)
+		);
+
+		add_settings_field(
+			'gtm_event_name',
+			__( 'Event name', 'floaty-book-now-chat' ),
+			array( $this, 'render_text_field' ),
+			$page_id,
+			'vzflty_settings_gtm',
+			array(
+				'key'         => 'gtm_event_name',
+				'default'     => 'vzflty_click',
+				'description' => __( 'Custom event name pushed to dataLayer on button click.', 'floaty-book-now-chat' ),
+			)
+		);
+	}
+
+	/**
+	 * Render GTM section description.
+	 *
+	 * @return void
+	 */
+	public function render_gtm_section_description() {
+		?>
+		<p><?php esc_html_e( 'Push button clicks to Google Tag Manager dataLayer for tracking in GA4, Google Ads, and other analytics tools.', 'floaty-book-now-chat' ); ?></p>
+		<?php
+	}
+
+	/**
 	 * Render a checkbox field.
 	 *
 	 * @param array $args Field args.
@@ -656,6 +738,45 @@ class VZFLTY_Admin {
 		$description = $args['description'] ?? '';
 		?>
 		<textarea name="<?php echo esc_attr( VZFLTY_OPTION_KEY . '[' . $key . ']' ); ?>" rows="8" cols="50" class="large-text code"><?php echo esc_textarea( $value ); ?></textarea>
+		<?php if ( $description ) : ?>
+			<p class="description"><?php echo wp_kses_post( $description ); ?></p>
+		<?php endif; ?>
+		<?php
+	}
+
+	/**
+	 * Render a pages multiselect field.
+	 *
+	 * @param array $args Field args.
+	 *
+	 * @return void
+	 */
+	public function render_pages_multiselect( $args ) {
+		$options     = $this->get_options();
+		$key         = $args['key'];
+		$selected    = isset( $options[ $key ] ) && is_array( $options[ $key ] ) ? $options[ $key ] : array();
+		$description = $args['description'] ?? '';
+
+		$pages = get_pages( array( 'sort_column' => 'post_title' ) );
+
+		if ( empty( $pages ) ) {
+			echo '<p>' . esc_html__( 'No pages found.', 'floaty-book-now-chat' ) . '</p>';
+			return;
+		}
+		?>
+		<fieldset>
+			<?php foreach ( $pages as $page ) : ?>
+				<label style="display: block; margin-bottom: 5px;">
+					<input
+						type="checkbox"
+						name="<?php echo esc_attr( VZFLTY_OPTION_KEY . '[' . $key . '][]' ); ?>"
+						value="<?php echo esc_attr( $page->ID ); ?>"
+						<?php checked( in_array( (string) $page->ID, $selected, true ) || in_array( $page->ID, $selected, true ) ); ?>
+					/>
+					<?php echo esc_html( $page->post_title ); ?>
+				</label>
+			<?php endforeach; ?>
+		</fieldset>
 		<?php if ( $description ) : ?>
 			<p class="description"><?php echo wp_kses_post( $description ); ?></p>
 		<?php endif; ?>
@@ -797,6 +918,10 @@ class VZFLTY_Admin {
 			'apointoo' => array(
 				'slug'  => 'apointoo',
 				'label' => __( 'Apointoo Booking', 'floaty-book-now-chat' ),
+			),
+			'gtm'      => array(
+				'slug'  => 'gtm',
+				'label' => __( 'GTM / Analytics', 'floaty-book-now-chat' ),
 			),
 		);
 	}

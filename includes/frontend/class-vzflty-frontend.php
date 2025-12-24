@@ -103,6 +103,10 @@ class VZFLTY_Frontend {
 				'enabled'    => (bool) vzflty_get_option_value( $options, 'apointoo_enabled', 0 ),
 				'merchantId' => vzflty_get_option_value( $options, 'apointoo_merchant_id', '' ),
 			),
+			'gtm'             => array(
+				'enabled'   => (bool) vzflty_get_option_value( $options, 'gtm_enabled', 0 ),
+				'eventName' => vzflty_get_option_value( $options, 'gtm_event_name', 'vzflty_click' ),
+			),
 			'i18n'            => array(
 				'defaultButtonLabel' => __( 'Book now', 'floaty-book-now-chat' ),
 				'whatsappLabel'      => __( 'WhatsApp', 'floaty-book-now-chat' ),
@@ -138,6 +142,39 @@ class VZFLTY_Frontend {
 
 		if ( 'iframe_modal' === $action && empty( $options['iframe_url'] ) ) {
 			return false;
+		}
+
+		// Device targeting check.
+		$is_mobile       = wp_is_mobile();
+		$show_on_desktop = ! empty( $options['show_on_desktop'] );
+		$show_on_mobile  = ! empty( $options['show_on_mobile'] );
+
+		if ( $is_mobile && ! $show_on_mobile ) {
+			return false;
+		}
+
+		if ( ! $is_mobile && ! $show_on_desktop ) {
+			return false;
+		}
+
+		// Page targeting check.
+		$page_targeting = isset( $options['page_targeting'] ) ? $options['page_targeting'] : 'all';
+
+		if ( 'homepage' === $page_targeting && ! is_front_page() ) {
+			return false;
+		}
+
+		if ( 'specific' === $page_targeting ) {
+			$target_pages = isset( $options['target_pages'] ) && is_array( $options['target_pages'] ) ? $options['target_pages'] : array();
+
+			if ( empty( $target_pages ) ) {
+				return false;
+			}
+
+			global $post;
+			if ( ! $post || ! in_array( $post->ID, $target_pages, true ) ) {
+				return false;
+			}
 		}
 
 		return true;
