@@ -77,12 +77,37 @@ class VZFLTY_Admin {
 	 * @return void
 	 */
 	public function add_settings_page() {
-		add_options_page(
+		$hook_suffix = add_options_page(
 			__( 'Floaty Book Now Chat Settings', 'floaty-book-now-chat' ),
 			__( 'Floaty', 'floaty-book-now-chat' ),
 			'manage_options',
 			self::PAGE_SLUG,
 			array( $this, 'render_settings_page' )
+		);
+
+		if ( $hook_suffix ) {
+			add_action( 'admin_enqueue_scripts', array( $this, 'enqueue_admin_scripts' ) );
+		}
+	}
+
+	/**
+	 * Enqueue admin scripts on the settings page.
+	 *
+	 * @param string $hook_suffix The current admin page hook suffix.
+	 *
+	 * @return void
+	 */
+	public function enqueue_admin_scripts( $hook_suffix ) {
+		if ( 'settings_page_' . self::PAGE_SLUG !== $hook_suffix ) {
+			return;
+		}
+
+		wp_enqueue_script(
+			'vzflty-admin',
+			plugins_url( 'assets/js/vzflty-admin.js', VZFLTY_PLUGIN_FILE ),
+			array(),
+			VZFLTY_VERSION,
+			true
 		);
 	}
 
@@ -291,6 +316,65 @@ class VZFLTY_Admin {
 			array(
 				'key'     => 'event_name',
 				'default' => 'vzflty_click',
+			)
+		);
+
+		// Display Rules Section.
+		add_settings_section(
+			'vzflty_settings_display',
+			__( 'Display Rules', 'floaty-book-now-chat' ),
+			null,
+			$page_id
+		);
+
+		add_settings_field(
+			'show_on_desktop',
+			__( 'Show on desktop', 'floaty-book-now-chat' ),
+			array( $this, 'render_checkbox_field' ),
+			$page_id,
+			'vzflty_settings_display',
+			array(
+				'key' => 'show_on_desktop',
+			)
+		);
+
+		add_settings_field(
+			'show_on_mobile',
+			__( 'Show on mobile', 'floaty-book-now-chat' ),
+			array( $this, 'render_checkbox_field' ),
+			$page_id,
+			'vzflty_settings_display',
+			array(
+				'key' => 'show_on_mobile',
+			)
+		);
+
+		add_settings_field(
+			'page_targeting',
+			__( 'Show on pages', 'floaty-book-now-chat' ),
+			array( $this, 'render_select_field' ),
+			$page_id,
+			'vzflty_settings_display',
+			array(
+				'key'     => 'page_targeting',
+				'options' => array(
+					'all'      => __( 'All pages', 'floaty-book-now-chat' ),
+					'homepage' => __( 'Homepage only', 'floaty-book-now-chat' ),
+					'specific' => __( 'Specific pages', 'floaty-book-now-chat' ),
+				),
+				'default' => 'all',
+			)
+		);
+
+		add_settings_field(
+			'target_pages',
+			__( 'Select pages', 'floaty-book-now-chat' ),
+			array( $this, 'render_pages_multiselect' ),
+			$page_id,
+			'vzflty_settings_display',
+			array(
+				'key'         => 'target_pages',
+				'description' => __( 'Only used when "Specific pages" is selected above.', 'floaty-book-now-chat' ),
 			)
 		);
 	}

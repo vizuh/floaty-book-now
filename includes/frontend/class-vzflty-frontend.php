@@ -26,6 +26,15 @@ class VZFLTY_Frontend {
 			return;
 		}
 
+		/**
+		 * Fires before the floating button assets are enqueued.
+		 *
+		 * @since 1.1.0
+		 *
+		 * @param array $options Current plugin options.
+		 */
+		do_action( 'vzflty_before_button_render', $options );
+
 		$style_handle  = 'vzflty-floaty';
 		$script_handle = 'vzflty-floaty';
 
@@ -52,7 +61,19 @@ class VZFLTY_Frontend {
 			wp_add_inline_style( $style_handle, $inline_css );
 		}
 
-		wp_localize_script( $script_handle, 'VZFLTY_SETTINGS', $this->prepare_script_data( $options ) );
+		$script_data = $this->prepare_script_data( $options );
+
+		/**
+		 * Filters the data passed to the frontend JavaScript.
+		 *
+		 * @since 1.1.0
+		 *
+		 * @param array $script_data Data to be localized.
+		 * @param array $options     Current plugin options.
+		 */
+		$script_data = apply_filters( 'vzflty_script_data', $script_data, $options );
+
+		wp_localize_script( $script_handle, 'VZFLTY_SETTINGS', $script_data );
 		wp_enqueue_script( $script_handle );
 	}
 

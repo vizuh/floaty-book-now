@@ -31,6 +31,15 @@ function vzflty_get_default_options() {
 		'whatsapp_message'      => '',
 		'apointoo_enabled'      => 0,
 		'apointoo_merchant_id'  => '',
+		// Device targeting.
+		'show_on_desktop'       => 1,
+		'show_on_mobile'        => 1,
+		// Page targeting.
+		'page_targeting'        => 'all', // 'all', 'homepage', 'specific'.
+		'target_pages'          => array(),
+		// GTM DataLayer.
+		'gtm_enabled'           => 0,
+		'gtm_event_name'        => 'vzflty_click',
 	);
 }
 
