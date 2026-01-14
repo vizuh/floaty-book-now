@@ -166,10 +166,35 @@ class VZFLTY_DB {
 			)
 		);
 
-		if ( ! $inserted ) {
-			return false;
-		}
-
 		return $wpdb->insert_id;
+	}
+
+	/**
+	 * Get leads with pagination.
+	 *
+	 * @param int $limit  Number of items.
+	 * @param int $offset Offset.
+	 *
+	 * @return array
+	 */
+	public function get_leads( $limit = 20, $offset = 0 ) {
+		global $wpdb;
+		return $wpdb->get_results(
+			$wpdb->prepare(
+				"SELECT * FROM {$this->leads_table} ORDER BY created_at DESC LIMIT %d OFFSET %d",
+				$limit,
+				$offset
+			)
+		);
+	}
+
+	/**
+	 * Get total leads count.
+	 *
+	 * @return int
+	 */
+	public function get_total_leads() {
+		global $wpdb;
+		return (int) $wpdb->get_var( "SELECT COUNT(*) FROM {$this->leads_table}" );
 	}
 }

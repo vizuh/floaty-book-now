@@ -83,15 +83,38 @@ class VZFLTY_Admin {
 	 * @return void
 	 */
 	public function add_settings_page() {
-		$hook_suffix = add_options_page(
-			__( 'Floaty Book Now Chat Settings', 'floaty-book-now-chat' ),
-			__( 'Floaty', 'floaty-book-now-chat' ),
+		// Main menu.
+		add_menu_page(
+			__( 'Floaty Button', 'floaty-book-now-chat' ),
+			__( 'Floaty Button', 'floaty-book-now-chat' ),
+			'manage_options',
+			self::PAGE_SLUG,
+			array( $this, 'render_settings_page' ),
+			'dashicons-format-chat',
+			30
+		);
+
+		// Settings Submenu (Default).
+		$settings_hook = add_submenu_page(
+			self::PAGE_SLUG,
+			__( 'Settings', 'floaty-book-now-chat' ),
+			__( 'Settings', 'floaty-book-now-chat' ),
 			'manage_options',
 			self::PAGE_SLUG,
 			array( $this, 'render_settings_page' )
 		);
 
-		if ( $hook_suffix ) {
+		// Leads Submenu.
+		$leads_hook = add_submenu_page(
+			self::PAGE_SLUG,
+			__( 'Leads', 'floaty-book-now-chat' ),
+			__( 'Leads', 'floaty-book-now-chat' ),
+			'manage_options',
+			'vzflty-leads',
+			array( $this, 'render_leads_page' )
+		);
+
+		if ( $settings_hook ) {
 			add_action( 'admin_enqueue_scripts', array( $this, 'enqueue_admin_scripts' ) );
 		}
 	}
@@ -104,7 +127,8 @@ class VZFLTY_Admin {
 	 * @return void
 	 */
 	public function enqueue_admin_scripts( $hook_suffix ) {
-		if ( 'settings_page_' . self::PAGE_SLUG !== $hook_suffix ) {
+		// Check for Top Level Page hook or Settings Submenu hook.
+		if ( 'toplevel_page_' . self::PAGE_SLUG !== $hook_suffix && 'floaty-button_page_' . self::PAGE_SLUG !== $hook_suffix ) {
 			return;
 		}
 
@@ -115,6 +139,113 @@ class VZFLTY_Admin {
 			VZFLTY_VERSION,
 			true
 		);
+	}
+
+	/**
+	 * Render the leads page.
+	 *
+	 * @return void
+	 */
+	public function render_leads_page() {
+		if ( ! current_user_can( 'manage_options' ) ) {
+			return;
+		}
+
+		require_once dirname( __DIR__ ) . '/class-vzflty-db.php';
+		$db = new VZFLTY_DB();
+
+		$paged  = isset( $_GET['paged'] ) ? absint( $_GET['paged'] ) : 1;
+		$limit  = 20;
+		$offset = ( $paged - 1 ) * $limit;
+
+		$leads       = $db->get_leads( $limit, $offset );
+		$total       = $db->get_total_leads();
+		$total_pages = ceil( $total / $limit );
+
+		?>
+		<div class="wrap">
+			<h1 class="wp-heading-inline"><?php esc_html_e( 'Leads', 'floaty-book-now-chat' ); ?></h1>
+			<hr class="wp-header-end">
+			
+			<div class="card" style="max-width: 100%; margin-top: 20px; padding: 0;">
+				<table class="wp-list-table widefat fixed striped table-view-list">
+					<thead>
+						<tr>
+							<th scope="col" id="date" class="manage-column column-date sortable desc">
+								<span><?php esc_html_e( 'Date', 'floaty-book-now-chat' ); ?></span>
+							</th>
+							<th scope="col" id="name" class="manage-column column-name">
+								<?php esc_html_e( 'Name', 'floaty-book-now-chat' ); ?>
+							</th>
+							<th scope="col" id="phone" class="manage-column column-phone">
+								<?php esc_html_e( 'Phone', 'floaty-book-now-chat' ); ?>
+							</th>
+							<th scope="col" id="email" class="manage-column column-email">
+								<?php esc_html_e( 'Email', 'floaty-book-now-chat' ); ?>
+							</th>
+							<th scope="col" id="source" class="manage-column column-source">
+								<?php esc_html_e( 'Source', 'floaty-book-now-chat' ); ?>
+							</th>
+						</tr>
+					</thead>
+
+					<tbody id="the-list">
+						<?php if ( empty( $leads ) ) : ?>
+							<tr>
+								<td colspan="5"><?php esc_html_e( 'No leads found.', 'floaty-book-now-chat' ); ?></td>
+							</tr>
+						<?php else : ?>
+							<?php foreach ( $leads as $lead ) : ?>
+								<tr>
+									<td class="date column-date" data-colname="Date">
+										<?php echo esc_html( $lead->created_at ); ?>
+									</td>
+									<td class="name column-name" data-colname="Name">
+										<strong><?php echo esc_html( $lead->lead_name ); ?></strong>
+									</td>
+									<td class="phone column-phone" data-colname="Phone">
+										<?php echo esc_html( $lead->lead_phone ); ?>
+									</td>
+									<td class="email column-email" data-colname="Email">
+										<?php echo esc_html( $lead->lead_email ); ?>
+									</td>
+									<td class="source column-source" data-colname="Source">
+										<?php if ( ! empty( $lead->source_url ) ) : ?>
+											<a href="<?php echo esc_url( $lead->source_url ); ?>" target="_blank">
+												<?php echo esc_html( wp_trim_words( $lead->source_url, 5, '...' ) ); ?>
+											</a>
+										<?php else : ?>
+											-
+										<?php endif; ?>
+									</td>
+								</tr>
+							<?php endforeach; ?>
+						<?php endif; ?>
+					</tbody>
+				</table>
+				
+				<?php if ( $total_pages > 1 ) : ?>
+					<div class="tablenav bottom">
+						<div class="tablenav-pages">
+							<span class="displaying-num"><?php echo sprintf( __( '%s items', 'floaty-book-now-chat' ), $total ); ?></span>
+							<?php
+							echo paginate_links(
+								array(
+									'base'      => add_query_arg( 'paged', '%#%' ),
+									'format'    => '',
+									'prev_text' => __( '&laquo;', 'floaty-book-now-chat' ),
+									'next_text' => __( '&raquo;', 'floaty-book-now-chat' ),
+									'total'     => $total_pages,
+									'current'   => $paged,
+								)
+							);
+							?>
+						</div>
+					</div>
+				<?php endif; ?>
+			</div>
+		</div>
+		<?php
 	}
 
 	/**

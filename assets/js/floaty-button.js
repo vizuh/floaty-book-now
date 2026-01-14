@@ -150,10 +150,13 @@
 		// Append Modal Markup if needed
 		// Only Lead Capture or Iframe Modal needs a modal container
 		// We'll add a generic one
+		// Append Modal Markup with premium structure
 		const modalHTML = `
 			<div class="vzflty-modal-backdrop" hidden></div>
 			<div class="vzflty-modal" hidden>
-				<button class="vzflty-modal-close" type="button" aria-label="${i18n.modalCloseLabel}" title="${i18n.modalCloseLabel}">${i18n.modalCloseText}</button>
+				<button class="vzflty-modal-close" type="button" aria-label="${i18n.modalCloseLabel || 'Close'}" title="${i18n.modalCloseLabel || 'Close'}">
+					<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg>
+				</button>
 				<div class="vzflty-modal-content"></div>
 			</div>
 		`;
@@ -311,6 +314,14 @@
 	function showModal() {
 		backdrop.hidden = false;
 		modal.hidden = false;
+
+		// Apply positioning class
+		if (settings.position && settings.position.includes('left')) {
+			modal.classList.add('vzflty-modal-left');
+		} else {
+			modal.classList.remove('vzflty-modal-left');
+		}
+
 		document.body.style.overflow = 'hidden';
 	}
 
