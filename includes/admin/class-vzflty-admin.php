@@ -49,6 +49,9 @@ class VZFLTY_Admin {
 		'apointoo' => array(
 			'slug' => 'apointoo',
 		),
+		'lead_capture' => array(
+			'slug' => 'lead_capture',
+		),
 	);
 
 	/**
@@ -69,6 +72,8 @@ class VZFLTY_Admin {
 		$this->register_whatsapp_section();
 		$this->register_custom_section();
 		$this->register_apointoo_section();
+		$this->register_apointoo_section();
+		$this->register_lead_capture_section();
 		$this->register_gtm_section();
 	}
 
@@ -177,7 +182,7 @@ class VZFLTY_Admin {
 		$mode           = $this->resolve_mode( $current_values );
 
 		if ( array_key_exists( 'mode', $input ) ) {
-			$mode = in_array( $input['mode'], array( 'whatsapp', 'custom' ), true ) ? $input['mode'] : $mode;
+			$mode = in_array( $input['mode'], array( 'whatsapp', 'custom', 'lead_capture' ), true ) ? $input['mode'] : $mode;
 		}
 
 		$output['mode']            = $mode;
@@ -265,6 +270,34 @@ class VZFLTY_Admin {
 			$output['gtm_event_name'] = sanitize_key( $input['gtm_event_name'] );
 		}
 
+		// Lead Capture Fields.
+		if ( array_key_exists( 'lc_field_name_enabled', $input ) ) {
+			$output['lc_field_name_enabled'] = ! empty( $input['lc_field_name_enabled'] ) ? 1 : 0;
+		}
+		if ( array_key_exists( 'lc_field_email_enabled', $input ) ) {
+			$output['lc_field_email_enabled'] = ! empty( $input['lc_field_email_enabled'] ) ? 1 : 0;
+		}
+		if ( array_key_exists( 'lc_field_phone_enabled', $input ) ) {
+			$output['lc_field_phone_enabled'] = ! empty( $input['lc_field_phone_enabled'] ) ? 1 : 0;
+		}
+		if ( array_key_exists( 'lc_redirect_type', $input ) ) {
+			$output['lc_redirect_type'] = in_array( $input['lc_redirect_type'], array( 'whatsapp', 'link' ), true ) ? $input['lc_redirect_type'] : 'whatsapp';
+		}
+		
+		// Zoho Fields.
+		if ( array_key_exists( 'zoho_enabled', $input ) ) {
+			$output['zoho_enabled'] = ! empty( $input['zoho_enabled'] ) ? 1 : 0;
+		}
+		if ( array_key_exists( 'zoho_action_url', $input ) ) {
+			$output['zoho_action_url'] = esc_url_raw( $input['zoho_action_url'] );
+		}
+		if ( array_key_exists( 'zoho_xnQsjsdp', $input ) ) {
+			$output['zoho_xnQsjsdp'] = sanitize_text_field( $input['zoho_xnQsjsdp'] );
+		}
+		if ( array_key_exists( 'zoho_xmIwtLD', $input ) ) {
+			$output['zoho_xmIwtLD'] = sanitize_text_field( $input['zoho_xmIwtLD'] );
+		}
+
 		return $output;
 	}
 
@@ -331,8 +364,9 @@ class VZFLTY_Admin {
 			array(
 				'key'     => 'mode',
 				'options' => array(
-					'whatsapp' => __( 'WhatsApp', 'floaty-book-now-chat' ),
-					'custom'   => __( 'Custom', 'floaty-book-now-chat' ),
+					'whatsapp'     => __( 'WhatsApp', 'floaty-book-now-chat' ),
+					'custom'       => __( 'Custom', 'floaty-book-now-chat' ),
+					'lead_capture' => __( 'Lead Capture Form', 'floaty-book-now-chat' ),
 				),
 				'default' => 'custom',
 			)
@@ -607,6 +641,128 @@ class VZFLTY_Admin {
 		printf(
 			'<p class="description"><small>%s</small></p>',
 			esc_html__( 'Google booking visibility depends on eligibility and provider setup.', 'floaty-book-now-chat' )
+		);
+	}
+
+	/**
+	 * Register the Lead Capture tab fields.
+	 *
+	 * @return void
+	 */
+	private function register_lead_capture_section() {
+		$page_id = $this->get_section_page_id( 'lead_capture' );
+
+		add_settings_section(
+			'vzflty_settings_lc_display',
+			__( 'Form Configuration', 'floaty-book-now-chat' ),
+			null,
+			$page_id
+		);
+
+		add_settings_field(
+			'lc_field_name_enabled',
+			__( 'Name field', 'floaty-book-now-chat' ),
+			array( $this, 'render_checkbox_field' ),
+			$page_id,
+			'vzflty_settings_lc_display',
+			array(
+				'key' => 'lc_field_name_enabled',
+				'description' => __( 'Show "Name" field (Required).', 'floaty-book-now-chat' )
+			)
+		);
+
+		add_settings_field(
+			'lc_field_email_enabled',
+			__( 'Email field', 'floaty-book-now-chat' ),
+			array( $this, 'render_checkbox_field' ),
+			$page_id,
+			'vzflty_settings_lc_display',
+			array(
+				'key' => 'lc_field_email_enabled',
+				'description' => __( 'Show "Email" field.', 'floaty-book-now-chat' )
+			)
+		);
+
+		add_settings_field(
+			'lc_field_phone_enabled',
+			__( 'Phone field', 'floaty-book-now-chat' ),
+			array( $this, 'render_checkbox_field' ),
+			$page_id,
+			'vzflty_settings_lc_display',
+			array(
+				'key' => 'lc_field_phone_enabled',
+				'description' => __( 'Show "Phone" field (Required).', 'floaty-book-now-chat' ),
+				'default' => 1
+			)
+		);
+
+		add_settings_field(
+			'lc_redirect_type',
+			__( 'After submit redirect to', 'floaty-book-now-chat' ),
+			array( $this, 'render_select_field' ),
+			$page_id,
+			'vzflty_settings_lc_display',
+			array(
+				'key' => 'lc_redirect_type',
+				'options' => array(
+					'whatsapp' => __( 'WhatsApp (uses WhatsApp tab settings)', 'floaty-book-now-chat' ),
+					'link'     => __( 'Custom Link (uses Custom tab settings)', 'floaty-book-now-chat' ),
+				),
+				'default' => 'whatsapp'
+			)
+		);
+
+		// Integrations Section
+		add_settings_section(
+			'vzflty_settings_lc_integrations',
+			__( 'Integrations (Zoho)', 'floaty-book-now-chat' ),
+			null,
+			$page_id
+		);
+
+		add_settings_field(
+			'zoho_enabled',
+			__( 'Enable Zoho WebTwLead', 'floaty-book-now-chat' ),
+			array( $this, 'render_checkbox_field' ),
+			$page_id,
+			'vzflty_settings_lc_integrations',
+			array(
+				'key' => 'zoho_enabled',
+			)
+		);
+
+		add_settings_field(
+			'zoho_action_url',
+			__( 'Action URL', 'floaty-book-now-chat' ),
+			array( $this, 'render_text_field' ),
+			$page_id,
+			'vzflty_settings_lc_integrations',
+			array(
+				'key' => 'zoho_action_url',
+				'description' => 'https://crm.zoho.com/crm/WebToLeadForm'
+			)
+		);
+
+		add_settings_field(
+			'zoho_xnQsjsdp',
+			__( 'Token: xnQsjsdp', 'floaty-book-now-chat' ),
+			array( $this, 'render_text_field' ),
+			$page_id,
+			'vzflty_settings_lc_integrations',
+			array(
+				'key' => 'zoho_xnQsjsdp',
+			)
+		);
+
+		add_settings_field(
+			'zoho_xmIwtLD',
+			__( 'Token: xmIwtLD', 'floaty-book-now-chat' ),
+			array( $this, 'render_text_field' ),
+			$page_id,
+			'vzflty_settings_lc_integrations',
+			array(
+				'key' => 'zoho_xmIwtLD',
+			)
 		);
 	}
 
@@ -919,6 +1075,10 @@ class VZFLTY_Admin {
 				'slug'  => 'apointoo',
 				'label' => __( 'Apointoo Booking', 'floaty-book-now-chat' ),
 			),
+			'lead_capture' => array(
+				'slug'  => 'lead_capture',
+				'label' => __( 'Lead Capture', 'floaty-book-now-chat' ),
+			),
 			'gtm'      => array(
 				'slug'  => 'gtm',
 				'label' => __( 'GTM / Analytics', 'floaty-book-now-chat' ),
@@ -955,6 +1115,10 @@ class VZFLTY_Admin {
 
 		if ( 'custom' === $mode ) {
 			return 'custom';
+		}
+
+		if ( 'lead_capture' === $mode ) {
+			return 'lead_capture';
 		}
 
 		if ( isset( $options['button_template'] ) && 'whatsapp' === $options['button_template'] ) {

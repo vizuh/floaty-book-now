@@ -34,6 +34,13 @@ class VZFLTY_Plugin {
 	 * @return void
 	 */
 	public function init() {
+		require_once __DIR__ . '/class-vzflty-lead-controller.php';
+		$leads_controller = new VZFLTY_Lead_Controller();
+		add_action( 'rest_api_init', array( $leads_controller, 'register_routes' ) );
+
+		require_once __DIR__ . '/integrations/class-vzflty-integration-manager.php';
+		new VZFLTY_Integration_Manager();
+
 		$this->frontend = new VZFLTY_Frontend();
 		add_action( 'wp_enqueue_scripts', array( $this->frontend, 'enqueue_assets' ) );
 
@@ -74,6 +81,10 @@ class VZFLTY_Plugin {
 	 * @return void
 	 */
 	public static function activate() {
+		require_once __DIR__ . '/class-vzflty-db.php';
+		$db = new VZFLTY_DB();
+		$db->install();
+
 		$new_options = get_option( VZFLTY_OPTION_KEY, array() );
 
 		if ( empty( $new_options ) ) {

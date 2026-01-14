@@ -192,11 +192,13 @@
 }
 
 @media (prefers-reduced-motion: reduce) {
+
   #vzflty-button-container .vzflty-button,
   #vzflty-button-container .vzflty-whatsapp-btn,
   #vzflty-button-container .vzflty-whatsapp-btn::after {
     transition: none !important;
   }
+
   #vzflty-button-container .vzflty-whatsapp-btn:hover {
     transform: none !important;
     box-shadow: var(--vzflty-wa-shadow) !important;
@@ -255,7 +257,119 @@
   #vzflty-button-container .vzflty-modal {
     inset: 4% 3%;
   }
+
   #vzflty-button-container .vzflty-modal-iframe {
     height: calc(100vh - 100px);
+  }
+}
+
+/* ==============================
+   Lead Capture Form
+   ============================== */
+
+#vzflty-button-container .vzflty-modal-content {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  height: 100%;
+  padding: 2.5rem;
+  overflow-y: auto;
+}
+
+#vzflty-button-container .vzflty-lead-form {
+  width: 100%;
+  max-width: 400px;
+  margin: 0 auto;
+  display: flex;
+  flex-direction: column;
+  gap: 1.25rem;
+}
+
+#vzflty-button-container .vzflty-lead-form h3 {
+  margin: 0 0 1rem;
+  font-family: var(--vzflty-font);
+  font-size: 1.5rem;
+  font-weight: 700;
+  text-align: center;
+  color: #1f2933;
+}
+
+#vzflty-button-container .vzflty-field input {
+  width: 100%;
+  padding: 14px 16px;
+  font-size: 16px;
+  border: 1px solid #dcdcdc;
+  border-radius: 8px;
+  background: #fcfcfc;
+  transition: all 0.2s ease;
+  font-family: var(--vzflty-font);
+  box-sizing: border-box;
+}
+
+#vzflty-button-container .vzflty-field input:focus {
+  outline: none;
+  border-color: #4b8bff;
+  background: #fff;
+  box-shadow: 0 0 0 3px rgba(75, 139, 255, 0.15);
+}
+
+#vzflty-button-container .vzflty-submit-btn {
+  padding: 14px;
+  font-family: var(--vzflty-font);
+  font-size: 16px;
+  font-weight: 600;
+  color: #fff;
+  background: linear-gradient(160deg, #4b8bff, #2246d9);
+  border: none;
+  border-radius: 8px;
+  cursor: pointer;
+  transition: transform 0.1s ease, box-shadow 0.2s ease;
+}
+
+#vzflty-button-container .vzflty-submit-btn:hover {
+  transform: translateY(-1px);
+  box-shadow: 0 8px 20px rgba(34, 70, 217, 0.25);
+}
+
+#vzflty-button-container .vzflty-submit-btn:active {
+  transform: translateY(0);
+}
+
+#vzflty-button-container .vzflty-submit-btn:disabled {
+  opacity: 0.7;
+  cursor: not-allowed;
+  transform: none;
+}
+
+#vzflty-button-container .vzflty-form-message {
+  text-align: center;
+  font-size: 14px;
+  margin-top: 5px;
+  min-height: 20px;
+  font-family: var(--vzflty-font);
+}
+
+#vzflty-button-container .vzflty-form-message.success {
+  color: #25d366;
+  font-weight: 600;
+}
+
+#vzflty-button-container .vzflty-form-message.error {
+  color: #e53e3e;
+}
+
+@media (max-width: 600px) {
+  #vzflty-button-container .vzflty-modal-content {
+    padding: 1.5rem;
+  }
+
+  #vzflty-button-container .vzflty-modal {
+    inset: 0 !important;
+    /* Full screen on mobile */
+    border-radius: 0;
+  }
+
+  #vzflty-button-container .vzflty-lead-form h3 {
+    font-size: 1.25rem;
   }
 }

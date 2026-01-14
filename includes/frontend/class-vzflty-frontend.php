@@ -99,6 +99,17 @@ class VZFLTY_Frontend {
 			'eventName'       => vzflty_get_option_value( $options, 'event_name', 'vzflty_click' ),
 			'whatsappPhone'   => vzflty_get_option_value( $options, 'whatsapp_phone', '' ),
 			'whatsappMessage' => vzflty_get_option_value( $options, 'whatsapp_message', '' ),
+			// Lead Capture & API.
+			'apiUrl'          => esc_url_raw( rest_url( 'floaty/v1/leads' ) ),
+			'nonce'           => wp_create_nonce( 'wp_rest' ),
+			'leadCapture'     => array(
+				'redirectType' => vzflty_get_option_value( $options, 'lc_redirect_type', 'whatsapp' ),
+				'fields'       => array(
+					'name'  => (bool) vzflty_get_option_value( $options, 'lc_field_name_enabled', 0 ),
+					'email' => (bool) vzflty_get_option_value( $options, 'lc_field_email_enabled', 0 ),
+					'phone' => (bool) vzflty_get_option_value( $options, 'lc_field_phone_enabled', 1 ),
+				),
+			),
 			'apointoo'        => array(
 				'enabled'    => (bool) vzflty_get_option_value( $options, 'apointoo_enabled', 0 ),
 				'merchantId' => vzflty_get_option_value( $options, 'apointoo_merchant_id', '' ),
@@ -112,6 +123,12 @@ class VZFLTY_Frontend {
 				'whatsappLabel'      => __( 'WhatsApp', 'floaty-book-now-chat' ),
 				'modalCloseLabel'    => __( 'Close', 'floaty-book-now-chat' ),
 				'modalCloseText'     => __( 'Close', 'floaty-book-now-chat' ),
+				'formNamePlaceholder' => __( 'Name', 'floaty-book-now-chat' ),
+				'formEmailPlaceholder' => __( 'Email', 'floaty-book-now-chat' ),
+				'formPhonePlaceholder' => __( 'Phone', 'floaty-book-now-chat' ),
+				'formSubmitLabel'     => __( 'Send', 'floaty-book-now-chat' ),
+				'formSuccessMessage'  => __( 'Thank you! Redirecting...', 'floaty-book-now-chat' ),
+				'formErrorMessage'    => __( 'An error occurred. Please try again.', 'floaty-book-now-chat' ),
 			),
 		);
 	}
@@ -134,6 +151,13 @@ class VZFLTY_Frontend {
 
 		if ( 'whatsapp' === $mode ) {
 			return $has_whatsapp_phone;
+		}
+
+		if ( 'lead_capture' === $mode ) {
+			// For Lead Capture, we assume it's valid if enabled, 
+			// though we might want to check if fields are enabled or redirect is valid.
+			// For now, return true.
+			return true;
 		}
 
 		if ( 'link' === $action && empty( $options['link_url'] ) ) {
@@ -192,6 +216,10 @@ class VZFLTY_Frontend {
 
 		if ( 'whatsapp' === $mode ) {
 			return 'whatsapp';
+		}
+
+		if ( 'lead_capture' === $mode ) {
+			return 'lead_capture';
 		}
 
 		if ( 'custom' === $mode ) {
