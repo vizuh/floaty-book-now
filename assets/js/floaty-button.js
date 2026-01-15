@@ -27,10 +27,10 @@
 	}
 
 	// ---------------------------------------------------------
-	// UTM Tracker
+	// UTM Tracker & Storage
 	// ---------------------------------------------------------
 	const UTMTracker = {
-		keys: ['utm_source', 'utm_medium', 'utm_campaign', 'utm_term', 'utm_content', 'utm_id', 'gclid', 'gbraid', 'wbraid', 'fbclid', 'ttclid'],
+		keys: ['utm_source', 'utm_medium', 'utm_campaign', 'utm_term', 'utm_content', 'utm_id', 'gclid', 'gbraid', 'wbraid', 'fbclid', 'ttclid', 'msclkid', 'ppclid', 'epik', 'route', 'rota', 'wpp_route', 'kw', 'keyword'],
 
 		init: function () {
 			this.capture();
@@ -39,7 +39,7 @@
 		capture: function () {
 			try {
 				const params = new URLSearchParams(window.location.search);
-				const storedRaw = localStorage.getItem('vzflty_utm');
+				const storedRaw = localStorage.getItem('macal:utm'); // Sharing storage key with RoundRobin snippet compatibility
 				const stored = storedRaw ? JSON.parse(storedRaw) : {};
 				const captured = {};
 				let foundNew = false;
@@ -63,7 +63,7 @@
 						referrer: document.referrer,
 					};
 					Object.assign(merged, stored, captured);
-					localStorage.setItem('vzflty_utm', JSON.stringify(merged));
+					localStorage.setItem('macal:utm', JSON.stringify(merged));
 				}
 			} catch (e) {
 				console.warn('Floaty UTM capture failed', e);
@@ -72,13 +72,91 @@
 
 		get: function () {
 			try {
-				return JSON.parse(localStorage.getItem('vzflty_utm')) || {};
+				return JSON.parse(localStorage.getItem('macal:utm')) || {};
 			} catch (e) {
 				return {};
 			}
 		}
 	};
 	UTMTracker.init();
+
+	// ---------------------------------------------------------
+	// Round Robin & Routing Logic (V6.3)
+	// ---------------------------------------------------------
+	const SignalRouter = {
+		normalizeStr: function (s) {
+			return (s || '').toString().toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g, '').replace(/[^a-z0-9]+/g, ' ').trim();
+		},
+
+		hasWord: function (haystack, word) {
+			return ` ${haystack} `.includes(` ${word} `);
+		},
+
+		isDoorByPathname: function () {
+			return /(^|\/)(categoria\/)?portas?(\/|$)/i.test(window.location.pathname || '');
+		},
+
+		detect: function () {
+			const qp = Object.fromEntries(new URLSearchParams(window.location.search));
+			const utm = UTMTracker.get();
+
+			const override = this.normalizeStr(qp.wpp_route || qp.route || qp.rota || utm.wpp_route || utm.route || utm.rota);
+			if (override === 'porta' || override === 'portas') return { yes: true, reason: 'override_param' };
+			if (override === 'geral') return { yes: false, reason: 'override_param' };
+
+			if (this.isDoorByPathname()) return { yes: true, reason: 'pathname_regex' };
+
+			const haystack = this.normalizeStr([
+				qp.utm_campaign, qp.utm_content, qp.utm_term, qp.kw, qp.keyword,
+				utm.utm_campaign, utm.utm_content, utm.utm_term, utm.kw, utm.keyword,
+				window.location.search
+			].filter(Boolean).join(' '));
+
+			if (this.hasWord(haystack, 'porta') || this.hasWord(haystack, 'portas')) {
+				return { yes: true, reason: 'keyword:porta(s)' };
+			}
+
+			// Pre-defined phrases from v6.3 snippet
+			const phrases = ['porta pivotante', 'porta de vidro', 'porta de aluminio', 'porta de madeira', 'porta social', 'porta lambril', 'porta de correr'];
+			const hit = phrases.find(p => haystack.includes(p));
+			if (hit) return { yes: true, reason: `keyword:${hit}` };
+
+			return { yes: false, reason: 'default' };
+		}
+	};
+
+	const RoundRobin = {
+		getCryptoRandInt: function (max) {
+			try {
+				const a = new Uint32Array(1);
+				crypto.getRandomValues(a);
+				return a[0] % max;
+			} catch (_) {
+				return Math.floor(Math.random() * max);
+			}
+		},
+
+		pick: function (list, storageKey) {
+			if (!list || list.length === 0) return null;
+
+			let idx = NaN;
+			try {
+				const stored = localStorage.getItem(storageKey);
+				if (stored !== null) idx = Number(stored);
+			} catch (_) { }
+
+			if (!Number.isInteger(idx) || idx < 0 || idx >= list.length) {
+				idx = this.getCryptoRandInt(list.length);
+			}
+
+			const chosen = list[idx];
+			try {
+				localStorage.setItem(storageKey, String((idx + 1) % list.length));
+			} catch (_) { }
+
+			return chosen;
+		}
+	};
 
 	// ---------------------------------------------------------
 	// Phone Masker (Brazil)
@@ -189,11 +267,45 @@
 		window.dataLayer.push(payload);
 	}
 
+	function getValuesFromSettings() {
+		// Prepare candidate list
+		let phones = [settings.whatsappPhone];
+		if (settings.whatsappRrNumbers) {
+			const extra = settings.whatsappRrNumbers.split(',').map(s => s.trim()).filter(Boolean);
+			if (extra.length > 0) phones = extra;
+		}
+
+		// Routing Signal
+		const door = SignalRouter.detect();
+		const rrKey = door.yes ? 'rr_porta_index' : 'rr_geral_index';
+
+		// Note: The logic assumes "door" implies specific routing, but for now we just Round Robin the available list.
+		// If we had distinct lists for "door" vs "general", we would select the list here. 
+		// Since we only have one admin list, we use it for all. 
+		// OR we can default to RR list for general and something else for Door? 
+		// User requirement v6.3 had two lists. For now, we will use the single configured list but rotate it.
+
+		const chosen = RoundRobin.pick(phones, rrKey) || phones[0];
+		// Fallback clean
+		const cleanPhone = (chosen || '').replace(/[^0-9]/g, '');
+
+		return {
+			phone: cleanPhone,
+			message: settings.whatsappMessage || '',
+			doorSignal: door
+		};
+	}
+
 	function openWhatsApp() {
-		if (!settings.whatsappPhone) return;
-		const phone = settings.whatsappPhone.replace(/[^0-9]/g, '');
-		const message = encodeURIComponent(settings.whatsappMessage || '');
-		const url = `https://wa.me/${phone}?text=${message}`;
+		const result = getValuesFromSettings();
+		if (!result.phone) return;
+
+		const message = encodeURIComponent(result.message);
+		const url = `https://wa.me/${result.phone}?text=${message}`;
+
+		// Update lead if just submitted? 
+		// We handle redirection logic separately in Lead Capture flow.
+		// Direct click logic:
 		window.open(url, '_blank');
 	}
 
@@ -266,7 +378,8 @@
 			email: formData.get('email'),
 			phone: formData.get('phone'),
 			utm: UTMTracker.get(),
-			source_url: window.location.href
+			source_url: window.location.href,
+			wpp_number: (getValuesFromSettings().phone || '')
 		};
 
 		pushToDataLayer('floaty_form_submit');

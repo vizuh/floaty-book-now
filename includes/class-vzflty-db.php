@@ -55,17 +55,26 @@ class VZFLTY_DB {
 
 		$charset_collate = $wpdb->get_charset_collate();
 
-		$sql_leads = "CREATE TABLE {$this->leads_table} (
 			id bigint(20) unsigned NOT NULL AUTO_INCREMENT,
 			lead_name varchar(255) NOT NULL,
 			lead_email varchar(255) DEFAULT '',
 			lead_phone varchar(50) NOT NULL,
 			lead_normalized_phone varchar(50) DEFAULT '',
 			utm_data text DEFAULT NULL,
+			utm_source varchar(100) DEFAULT '',
+			utm_medium varchar(100) DEFAULT '',
+			utm_campaign varchar(100) DEFAULT '',
+			click_ids text DEFAULT NULL,
+			landing_page text DEFAULT NULL,
+			wpp_number varchar(50) DEFAULT '',
 			status varchar(50) DEFAULT 'new',
+			integration_status varchar(50) DEFAULT 'pending',
 			source_url varchar(1000) DEFAULT '',
 			created_at datetime DEFAULT CURRENT_TIMESTAMP,
-			PRIMARY KEY  (id)
+			PRIMARY KEY  (id),
+			KEY status (status),
+			KEY created_at (created_at),
+			KEY utm_source (utm_source)
 		) $charset_collate;";
 
 		$sql_queue = "CREATE TABLE {$this->queue_table} (
@@ -125,7 +134,14 @@ class VZFLTY_DB {
 				'%s', // lead_phone.
 				'%s', // lead_normalized_phone.
 				'%s', // utm_data (json).
+				'%s', // utm_source.
+				'%s', // utm_medium.
+				'%s', // utm_campaign.
+				'%s', // click_ids.
+				'%s', // landing_page.
+				'%s', // wpp_number.
 				'%s', // status.
+				'%s', // integration_status.
 				'%s', // source_url.
 				'%s', // created_at.
 			)

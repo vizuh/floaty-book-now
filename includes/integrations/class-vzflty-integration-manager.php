@@ -16,17 +16,14 @@ require_once __DIR__ . '/class-vzflty-zoho-integration.php';
  */
 class VZFLTY_Integration_Manager {
 
-	/**
-	 * Registered integrations.
-	 *
-	 * @var VZFLTY_Integration[]
-	 */
-	private $integrations = array();
+	public function __construct() {
+		// Constructor left empty or used for property initialization if needed.
+	}
 
 	/**
-	 * Constructor.
+	 * Initialize Manager.
 	 */
-	public function __construct() {
+	public function init() {
 		$this->register_integrations();
 		add_action( 'vzflty_lead_created', array( $this, 'dispatch_lead' ), 10, 2 );
 	}
@@ -35,7 +32,9 @@ class VZFLTY_Integration_Manager {
 	 * Register available integrations.
 	 */
 	private function register_integrations() {
-		$this->integrations['zoho'] = new VZFLTY_Zoho_Integration();
+		// $this->integrations['zoho'] = new VZFLTY_Zoho_Integration(); 
+		// Note: Zoho is handled separately via settings in basic version, 
+		// but ideally belongs here. For now we focus on the new Webhook.
 	}
 
 	/**
@@ -49,53 +48,42 @@ class VZFLTY_Integration_Manager {
 	public function dispatch_lead( $lead_id, $data ) {
 		$options = vzflty_get_options();
 		
-		// Check global integrations toggle if proper settings existed, 
-		// but for now check individual.
-		
-		// Zoho
-		if ( ! empty( $options['zoho_enabled'] ) ) {
-			$this->process_integration( 'zoho', $lead_id, $data );
+		// Generic Webhook
+		if ( ! empty( $options['integration_enabled'] ) && ! empty( $options['integration_webhook_url'] ) ) {
+			$this->send_webhook( $lead_id, $data, $options['integration_webhook_url'] );
 		}
-
-		// Webhook (Future)
-		// if ( ! empty( $options['webhook_enabled'] ) ) ...
 	}
 
 	/**
-	 * Process a single integration.
+	 * Send webhook.
 	 *
-	 * @param string $slug    Integration slug.
 	 * @param int    $lead_id Lead ID.
-	 * @param array  $data    Lead Data.
+	 * @param array  $data    Lead data.
+	 * @param string $url     Webhook URL.
+	 *
+	 * @return void
 	 */
-	private function process_integration( $slug, $lead_id, $data ) {
-		if ( ! isset( $this->integrations[ $slug ] ) ) {
-			return;
-		}
-
-		$integration = $this->integrations[ $slug ];
-		$result      = $integration->send( $data );
-		$status      = is_wp_error( $result ) ? 'failed' : 'completed';
-		$error       = is_wp_error( $result ) ? $result->get_error_message() : '';
-
-		// Log to Queue/History Table (Synchronous for now).
-		$db = new VZFLTY_DB();
-		$queue_data = array(
+	private function send_webhook( $lead_id, $data, $url ) {
+		$payload = array(
+			'event'     => 'lead_created',
 			'lead_id'   => $lead_id,
-			'type'      => $slug,
-			'payload'   => $data, // Simplified.
-			'status'    => $status,
-			'last_error' => $error,
+			'timestamp' => current_time( 'c' ),
+			'data'      => $data,
 		);
 
-		// We use add_to_queue even if it's already "completed" just for history.
-		// In a real queue system, we'd insert with 'pending' then process.
-		// Here we process *then* log result.
-		$db->add_to_queue( $lead_id, $slug, $data ); 
+		$args = array(
+			'body'        => wp_json_encode( $payload ),
+			'headers'     => array(
+				'Content-Type' => 'application/json',
+			),
+			'timeout'     => 5,
+			'blocking'    => false,
+		);
+
+		wp_remote_post( $url, $args );
 		
-		// Update the queue item with status immediately if we want to be precise,
-		// but `add_to_queue` sets status to 'pending' by default. 
-		// Let's assume for MVP we just want to fire and forget, logging is secondary.
-		// A proper queue implementation is Phase 3/4.
+		// Log attempt to queue (history)
+		$db = new VZFLTY_DB();
+		$db->add_to_queue( $lead_id, 'webhook', $payload );
 	}
 }

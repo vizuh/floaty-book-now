@@ -151,98 +151,20 @@ class VZFLTY_Admin {
 			return;
 		}
 
-		require_once dirname( __DIR__ ) . '/class-vzflty-db.php';
-		$db = new VZFLTY_DB();
-
-		$paged  = isset( $_GET['paged'] ) ? absint( $_GET['paged'] ) : 1;
-		$limit  = 20;
-		$offset = ( $paged - 1 ) * $limit;
-
-		$leads       = $db->get_leads( $limit, $offset );
-		$total       = $db->get_total_leads();
-		$total_pages = ceil( $total / $limit );
+		require_once dirname( __DIR__ ) . '/admin/class-vzflty-leads-list-table.php';
+		
+		$list_table = new VZFLTY_Leads_List_Table();
+		$list_table->prepare_items();
 
 		?>
 		<div class="wrap">
 			<h1 class="wp-heading-inline"><?php esc_html_e( 'Leads', 'floaty-book-now-chat' ); ?></h1>
 			<hr class="wp-header-end">
 			
-			<div class="card" style="max-width: 100%; margin-top: 20px; padding: 0;">
-				<table class="wp-list-table widefat fixed striped table-view-list">
-					<thead>
-						<tr>
-							<th scope="col" id="date" class="manage-column column-date sortable desc">
-								<span><?php esc_html_e( 'Date', 'floaty-book-now-chat' ); ?></span>
-							</th>
-							<th scope="col" id="name" class="manage-column column-name">
-								<?php esc_html_e( 'Name', 'floaty-book-now-chat' ); ?>
-							</th>
-							<th scope="col" id="phone" class="manage-column column-phone">
-								<?php esc_html_e( 'Phone', 'floaty-book-now-chat' ); ?>
-							</th>
-							<th scope="col" id="email" class="manage-column column-email">
-								<?php esc_html_e( 'Email', 'floaty-book-now-chat' ); ?>
-							</th>
-							<th scope="col" id="source" class="manage-column column-source">
-								<?php esc_html_e( 'Source', 'floaty-book-now-chat' ); ?>
-							</th>
-						</tr>
-					</thead>
-
-					<tbody id="the-list">
-						<?php if ( empty( $leads ) ) : ?>
-							<tr>
-								<td colspan="5"><?php esc_html_e( 'No leads found.', 'floaty-book-now-chat' ); ?></td>
-							</tr>
-						<?php else : ?>
-							<?php foreach ( $leads as $lead ) : ?>
-								<tr>
-									<td class="date column-date" data-colname="Date">
-										<?php echo esc_html( $lead->created_at ); ?>
-									</td>
-									<td class="name column-name" data-colname="Name">
-										<strong><?php echo esc_html( $lead->lead_name ); ?></strong>
-									</td>
-									<td class="phone column-phone" data-colname="Phone">
-										<?php echo esc_html( $lead->lead_phone ); ?>
-									</td>
-									<td class="email column-email" data-colname="Email">
-										<?php echo esc_html( $lead->lead_email ); ?>
-									</td>
-									<td class="source column-source" data-colname="Source">
-										<?php if ( ! empty( $lead->source_url ) ) : ?>
-											<a href="<?php echo esc_url( $lead->source_url ); ?>" target="_blank">
-												<?php echo esc_html( wp_trim_words( $lead->source_url, 5, '...' ) ); ?>
-											</a>
-										<?php else : ?>
-											-
-										<?php endif; ?>
-									</td>
-								</tr>
-							<?php endforeach; ?>
-						<?php endif; ?>
-					</tbody>
-				</table>
-				
-				<?php if ( $total_pages > 1 ) : ?>
-					<div class="tablenav bottom">
-						<div class="tablenav-pages">
-							<span class="displaying-num"><?php echo sprintf( __( '%s items', 'floaty-book-now-chat' ), $total ); ?></span>
-							<?php
-							echo paginate_links(
-								array(
-									'base'      => add_query_arg( 'paged', '%#%' ),
-									'format'    => '',
-									'prev_text' => __( '&laquo;', 'floaty-book-now-chat' ),
-									'next_text' => __( '&raquo;', 'floaty-book-now-chat' ),
-									'total'     => $total_pages,
-									'current'   => $paged,
-								)
-							);
-							?>
-						</div>
-					</div>
-				<?php endif; ?>
+			<div class="card" style="max-width: 100%; margin-top: 20px; padding: 20px;">
+				<form method="post">
+					<?php $list_table->display(); ?>
+				</form>
 			</div>
 		</div>
 		<?php
@@ -359,8 +281,11 @@ class VZFLTY_Admin {
 			$output['whatsapp_phone'] = preg_replace( '/[^0-9]/', '', $input['whatsapp_phone'] );
 		}
 
-		if ( array_key_exists( 'whatsapp_message', $input ) ) {
 			$output['whatsapp_message'] = sanitize_text_field( $input['whatsapp_message'] );
+		}
+
+		if ( array_key_exists( 'whatsapp_rr_numbers', $input ) ) {
+			$output['whatsapp_rr_numbers'] = sanitize_textarea_field( $input['whatsapp_rr_numbers'] );
 		}
 
 		if ( array_key_exists( 'apointoo_enabled', $input ) ) {
@@ -425,8 +350,31 @@ class VZFLTY_Admin {
 		if ( array_key_exists( 'zoho_xnQsjsdp', $input ) ) {
 			$output['zoho_xnQsjsdp'] = sanitize_text_field( $input['zoho_xnQsjsdp'] );
 		}
-		if ( array_key_exists( 'zoho_xmIwtLD', $input ) ) {
 			$output['zoho_xmIwtLD'] = sanitize_text_field( $input['zoho_xmIwtLD'] );
+		}
+
+		// Language Tokens.
+		$i18n_keys = array(
+			'i18n_form_title',
+			'i18n_form_subtitle',
+			'i18n_name_placeholder',
+			'i18n_email_placeholder',
+			'i18n_phone_placeholder',
+			'i18n_submit_label',
+			'i18n_success_message',
+		);
+		foreach ( $i18n_keys as $key ) {
+			if ( array_key_exists( $key, $input ) ) {
+				$output[ $key ] = sanitize_text_field( $input[ $key ] );
+			}
+		}
+
+		// Integration Settings.
+		if ( array_key_exists( 'integration_enabled', $input ) ) {
+			$output['integration_enabled'] = ! empty( $input['integration_enabled'] ) ? 1 : 0;
+		}
+		if ( array_key_exists( 'integration_webhook_url', $input ) ) {
+			$output['integration_webhook_url'] = esc_url_raw( $input['integration_webhook_url'] );
 		}
 
 		return $output;
@@ -611,6 +559,19 @@ class VZFLTY_Admin {
 			array(
 				'key'         => 'whatsapp_message',
 				'description' => __( 'Optional message shown when the chat opens.', 'floaty-book-now-chat' ),
+			)
+		);
+		);
+		
+		add_settings_field(
+			'whatsapp_rr_numbers',
+			__( 'Round Robin Numbers', 'floaty-book-now-chat' ),
+			array( $this, 'render_textarea_field' ),
+			$page_id,
+			'vzflty_settings_whatsapp',
+			array(
+				'key'         => 'whatsapp_rr_numbers',
+				'description' => __( 'Enter multiple WhatsApp numbers separated by commas for Round Robin rotation. If empty, the single number above is used.', 'floaty-book-now-chat' ),
 			)
 		);
 	}
@@ -798,7 +759,6 @@ class VZFLTY_Admin {
 			'vzflty_settings_lc_display',
 			array(
 				'key' => 'lc_field_name_enabled',
-				'description' => __( 'Show "Name" field (Required).', 'floaty-book-now-chat' )
 			)
 		);
 
