@@ -20,6 +20,10 @@ class VZFLTY_Frontend {
 	 * @return void
 	 */
 	public function enqueue_assets() {
+		if ( ! $this->is_supported_request() ) {
+			return;
+		}
+
 		$options = vzflty_get_options();
 
 		if ( ! $this->should_render( $options ) ) {
@@ -198,10 +202,51 @@ class VZFLTY_Frontend {
 				return false;
 			}
 
-			global $post;
-			if ( ! $post || ! in_array( $post->ID, $target_pages, true ) ) {
+			$page_id = get_queried_object_id();
+
+			if ( ! $page_id || ! in_array( $page_id, array_map( 'absint', $target_pages ), true ) ) {
 				return false;
 			}
+		}
+
+		return true;
+	}
+
+	/**
+	 * Restrict asset loading to normal public HTML requests.
+	 *
+	 * This avoids leaking plugin assets into feeds, previews, embeds, or
+	 * builder contexts where the request is not a standard theme page.
+	 *
+	 * @return bool
+	 */
+	private function is_supported_request() {
+		if ( is_admin() || wp_doing_ajax() || wp_doing_cron() ) {
+			return false;
+		}
+
+		if ( defined( 'REST_REQUEST' ) && REST_REQUEST ) {
+			return false;
+		}
+
+		if ( function_exists( 'wp_is_json_request' ) && wp_is_json_request() ) {
+			return false;
+		}
+
+		if ( is_feed() || is_embed() || is_trackback() || is_robots() || is_favicon() ) {
+			return false;
+		}
+
+		if ( is_preview() || is_customize_preview() ) {
+			return false;
+		}
+
+		if ( isset( $_GET['elementor-preview'] ) ) { // phpcs:ignore WordPress.Security.NonceVerification.Recommended
+			return false;
+		}
+
+		if ( 'elementor_library' === get_post_type( get_queried_object_id() ) ) {
+			return false;
 		}
 
 		return true;

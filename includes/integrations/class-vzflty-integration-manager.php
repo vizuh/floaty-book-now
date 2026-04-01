@@ -16,6 +16,13 @@ require_once __DIR__ . '/class-vzflty-zoho-integration.php';
  */
 class VZFLTY_Integration_Manager {
 
+	/**
+	 * Registered integration instances keyed by slug.
+	 *
+	 * @var array
+	 */
+	private $integrations = array();
+
 	public function __construct() {
 		// Constructor left empty or used for property initialization if needed.
 	}

@@ -34,12 +34,14 @@ class VZFLTY_Plugin {
 	 * @return void
 	 */
 	public function init() {
+		require_once __DIR__ . '/class-vzflty-db.php';
 		require_once __DIR__ . '/class-vzflty-lead-controller.php';
 		$leads_controller = new VZFLTY_Lead_Controller();
 		add_action( 'rest_api_init', array( $leads_controller, 'register_routes' ) );
 
 		require_once __DIR__ . '/integrations/class-vzflty-integration-manager.php';
-		new VZFLTY_Integration_Manager();
+		$integration_manager = new VZFLTY_Integration_Manager();
+		$integration_manager->init();
 
 		$this->frontend = new VZFLTY_Frontend();
 		add_action( 'wp_enqueue_scripts', array( $this->frontend, 'enqueue_assets' ) );

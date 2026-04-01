@@ -52,6 +52,9 @@ class VZFLTY_Admin {
 		'lead_capture' => array(
 			'slug' => 'lead_capture',
 		),
+		'gtm'      => array(
+			'slug' => 'gtm',
+		),
 	);
 
 	/**
@@ -71,7 +74,6 @@ class VZFLTY_Admin {
 		$this->register_general_section();
 		$this->register_whatsapp_section();
 		$this->register_custom_section();
-		$this->register_apointoo_section();
 		$this->register_apointoo_section();
 		$this->register_lead_capture_section();
 		$this->register_gtm_section();
