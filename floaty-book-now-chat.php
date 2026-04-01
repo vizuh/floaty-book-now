@@ -3,7 +3,7 @@
  * Plugin Name: Floaty Book Now Chat
  * Plugin URI:  https://github.com/vizuh/floaty-book-now
  * Description: Floating “book now” and WhatsApp chat button with modal support.
- * Version:     1.0.0
+ * Version:     1.0.1
  * Author:      Vizuh
  * Author URI:  https://vizuh.com
  * Text Domain: floaty-book-now-chat
@@ -21,7 +21,7 @@ if ( ! defined( 'ABSPATH' ) ) {
 	exit;
 }
 
-define( 'VZFLTY_VERSION', '1.0.0' );
+define( 'VZFLTY_VERSION', '1.0.1' );
 define( 'VZFLTY_OPTION_KEY', 'vzflty_options' );
 define( 'VZFLTY_PLUGIN_FILE', __FILE__ );
 

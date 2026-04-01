@@ -74,6 +74,13 @@ On click, Floaty pushes this to `window.dataLayer` (if available):
 
 No build step. PHP + assets are ready to run.
 
+## Changelog
+
+### 1.0.1
+- Prevented frontend assets from loading in feed, XML-style, preview, embed, and Elementor builder contexts.
+- Hardened frontend targeting and plugin bootstrapping for lead capture and integrations.
+- Fixed the GTM admin tab registration and removed duplicate Apointoo section registration.
+
 ### PHPCS (WordPress Coding Standards)
 - `phpcs --standard=WordPress --ignore=vendor --extensions=php .`
 - `phpcbf --standard=WordPress --ignore=vendor --extensions=php .`

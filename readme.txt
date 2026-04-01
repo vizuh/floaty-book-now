@@ -4,7 +4,7 @@ Tags: booking, appointments, whatsapp, chat, modal
 Requires at least: 6.4
 Tested up to: 6.9
 Requires PHP: 7.4
-Stable tag: 1.0.0
+Stable tag: 1.0.1
 License: GPLv2 or later
 License URI: https://www.gnu.org/licenses/gpl-2.0.html
 
@@ -65,10 +65,20 @@ Floaty pushes an event to `window.dataLayer` (if present):
 
 == Changelog ==
 
+= 1.0.1 =
+* Prevented frontend assets from loading in XML, feed, preview, embed, and Elementor builder contexts to reduce theme and response-type conflicts.
+* Improved frontend page targeting checks to avoid relying on fragile global post state.
+* Fixed integration manager initialization so lead integrations are registered during normal runtime.
+* Loaded the database class during plugin boot for lead capture and integration paths.
+* Fixed the missing GTM tab registration and removed a duplicate Apointoo section registration in admin settings.
+
 = 1.0.0 =
 * Initial release.
 
 == Upgrade Notice ==
+
+= 1.0.1 =
+Recommended maintenance release for sites using Elementor or pages that generate XML-style responses.
 
 = 1.0.0 =
 Initial release.
