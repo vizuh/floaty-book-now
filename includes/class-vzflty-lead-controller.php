@@ -53,11 +53,19 @@ class VZFLTY_Lead_Controller extends WP_REST_Controller {
 	 *
 	 * @param WP_REST_Request $request Request object.
 	 *
-	 * @return bool
+	 * @return bool|WP_Error
 	 */
 	public function create_item_permissions_check( $request ) {
-		// Public endpoint, but we can rate limit or nonce check here if needed later.
-		// For now, simple nonce check via header is recommended in frontend.
+		$nonce = $request->get_header( 'X-WP-Nonce' );
+
+		if ( empty( $nonce ) || ! wp_verify_nonce( $nonce, 'wp_rest' ) ) {
+			return new WP_Error(
+				'rest_forbidden',
+				__( 'Invalid or missing nonce.', 'floaty-book-now-chat' ),
+				array( 'status' => 403 )
+			);
+		}
+
 		return true;
 	}
 
@@ -74,8 +82,14 @@ class VZFLTY_Lead_Controller extends WP_REST_Controller {
 		$email = sanitize_email( $request->get_param( 'email' ) );
 		$phone = sanitize_text_field( $request->get_param( 'phone' ) );
 
-		if ( empty( $name ) || empty( $phone ) ) {
-			return new WP_Error( 'missing_fields', __( 'Name and Phone are required.', 'floaty-book-now-chat' ), array( 'status' => 400 ) );
+		$options = vzflty_get_options();
+
+		if ( ! empty( $options['lc_field_name_enabled'] ) && empty( $name ) ) {
+			return new WP_Error( 'missing_fields', __( 'Name is required.', 'floaty-book-now-chat' ), array( 'status' => 400 ) );
+		}
+
+		if ( ! empty( $options['lc_field_phone_enabled'] ) && empty( $phone ) ) {
+			return new WP_Error( 'missing_fields', __( 'Phone is required.', 'floaty-book-now-chat' ), array( 'status' => 400 ) );
 		}
 
 		// Prepare Data.
@@ -119,21 +133,21 @@ class VZFLTY_Lead_Controller extends WP_REST_Controller {
 	public function get_endpoint_args() {
 		return array(
 			'name' => array(
-				'description' => __( 'Lead Name', 'floaty-book-now-chat' ),
-				'type'        => 'string',
-				'required'    => true,
+				'description'       => __( 'Lead Name', 'floaty-book-now-chat' ),
+				'type'              => 'string',
+				'required'          => false,
 				'sanitize_callback' => 'sanitize_text_field',
 			),
 			'email' => array(
-				'description' => __( 'Lead Email', 'floaty-book-now-chat' ),
-				'type'        => 'string',
-				'required'    => false,
+				'description'       => __( 'Lead Email', 'floaty-book-now-chat' ),
+				'type'              => 'string',
+				'required'          => false,
 				'sanitize_callback' => 'sanitize_email',
 			),
 			'phone' => array(
-				'description' => __( 'Lead Phone', 'floaty-book-now-chat' ),
-				'type'        => 'string',
-				'required'    => true,
+				'description'       => __( 'Lead Phone', 'floaty-book-now-chat' ),
+				'type'              => 'string',
+				'required'          => false,
 				'sanitize_callback' => 'sanitize_text_field',
 			),
 			'utm' => array(

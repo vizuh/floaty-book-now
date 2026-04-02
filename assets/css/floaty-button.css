@@ -213,6 +213,12 @@
    Modal (Premium Glassmorphism)
    ============================== */
 
+/* Ensure hidden attribute is respected even when display is set by CSS */
+#vzflty-button-container .vzflty-modal-backdrop[hidden],
+#vzflty-button-container .vzflty-modal[hidden] {
+  display: none !important;
+}
+
 @keyframes vzflty-fade-in {
   from {
     opacity: 0;
@@ -299,6 +305,12 @@
   right: 16px;
   width: 32px;
   height: 32px;
+  min-width: 32px;
+  min-height: 32px;
+  max-width: 32px;
+  max-height: 32px;
+  padding: 0;
+  box-sizing: content-box;
   display: flex;
   align-items: center;
   justify-content: center;

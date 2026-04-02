@@ -287,11 +287,7 @@ class VZFLTY_Admin {
 			$output['whatsapp_message'] = sanitize_text_field( $input['whatsapp_message'] );
 		}
 
-		if ( array_key_exists( 'whatsapp_rr_numbers', $input ) ) {
-			$output['whatsapp_rr_numbers'] = sanitize_textarea_field( $input['whatsapp_rr_numbers'] );
-		}
-
-		if ( array_key_exists( 'apointoo_enabled', $input ) ) {
+if ( array_key_exists( 'apointoo_enabled', $input ) ) {
 			$output['apointoo_enabled'] = ! empty( $input['apointoo_enabled'] ) ? 1 : 0;
 		}
 
@@ -567,17 +563,6 @@ class VZFLTY_Admin {
 		);
 
 		
-		add_settings_field(
-			'whatsapp_rr_numbers',
-			__( 'Round Robin Numbers', 'floaty-book-now-chat' ),
-			array( $this, 'render_textarea_field' ),
-			$page_id,
-			'vzflty_settings_whatsapp',
-			array(
-				'key'         => 'whatsapp_rr_numbers',
-				'description' => __( 'Enter multiple WhatsApp numbers separated by commas for Round Robin rotation. If empty, the single number above is used.', 'floaty-book-now-chat' ),
-			)
-		);
 	}
 
 	/**

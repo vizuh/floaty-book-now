@@ -102,7 +102,6 @@ class VZFLTY_Frontend {
 			'iframeUrl'       => vzflty_get_option_value( $options, 'iframe_url', '' ),
 			'eventName'       => vzflty_get_option_value( $options, 'event_name', 'vzflty_click' ),
 			'whatsappPhone'   => vzflty_get_option_value( $options, 'whatsapp_phone', '' ),
-			'whatsappRrNumbers' => vzflty_get_option_value( $options, 'whatsapp_rr_numbers', '' ),
 			'whatsappMessage' => vzflty_get_option_value( $options, 'whatsapp_message', '' ),
 			// Lead Capture & API.
 			'apiUrl'          => esc_url_raw( rest_url( 'floaty/v1/leads' ) ),
