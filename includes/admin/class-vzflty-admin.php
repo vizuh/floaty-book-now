@@ -52,9 +52,6 @@ class VZFLTY_Admin {
 		'lead_capture' => array(
 			'slug' => 'lead_capture',
 		),
-		'gtm'      => array(
-			'slug' => 'gtm',
-		),
 	);
 
 	/**
@@ -76,7 +73,6 @@ class VZFLTY_Admin {
 		$this->register_custom_section();
 		$this->register_apointoo_section();
 		$this->register_lead_capture_section();
-		$this->register_gtm_section();
 	}
 
 	/**
@@ -240,6 +236,9 @@ class VZFLTY_Admin {
 			'zoho_action_url',
 			'zoho_xnQsjsdp',
 			'zoho_xmIwtLD',
+			'event_name',
+			'gtm_enabled',
+			'gtm_event_name',
 		);
 
 		foreach ( $legacy_keys as $legacy_key ) {
@@ -281,10 +280,6 @@ class VZFLTY_Admin {
 			$output['iframe_url'] = esc_url_raw( $input['iframe_url'] );
 		}
 
-		if ( array_key_exists( 'event_name', $input ) ) {
-			$output['event_name'] = sanitize_key( $input['event_name'] );
-		}
-
 		if ( array_key_exists( 'custom_css', $input ) ) {
 			$output['custom_css'] = wp_strip_all_tags( $input['custom_css'] );
 		}
@@ -297,7 +292,7 @@ class VZFLTY_Admin {
 			$output['whatsapp_message'] = sanitize_text_field( $input['whatsapp_message'] );
 		}
 
-if ( array_key_exists( 'apointoo_enabled', $input ) ) {
+		if ( array_key_exists( 'apointoo_enabled', $input ) ) {
 			$output['apointoo_enabled'] = ! empty( $input['apointoo_enabled'] ) ? 1 : 0;
 		}
 
@@ -324,15 +319,6 @@ if ( array_key_exists( 'apointoo_enabled', $input ) ) {
 		} elseif ( ! array_key_exists( 'target_pages', $input ) ) {
 			// Checkbox not checked, reset to empty array.
 			$output['target_pages'] = array();
-		}
-
-		// GTM DataLayer.
-		if ( array_key_exists( 'gtm_enabled', $input ) ) {
-			$output['gtm_enabled'] = ! empty( $input['gtm_enabled'] ) ? 1 : 0;
-		}
-
-		if ( array_key_exists( 'gtm_event_name', $input ) ) {
-			$output['gtm_event_name'] = sanitize_key( $input['gtm_event_name'] );
 		}
 
 		// Lead Capture Fields.
@@ -444,18 +430,6 @@ if ( array_key_exists( 'apointoo_enabled', $input ) ) {
 					'lead_capture' => __( 'Lead Capture Form', 'floaty-book-now-chat' ),
 				),
 				'default' => 'custom',
-			)
-		);
-
-		add_settings_field(
-			'event_name',
-			__( 'DataLayer event name', 'floaty-book-now-chat' ),
-			array( $this, 'render_text_field' ),
-			$page_id,
-			'vzflty_settings_general',
-			array(
-				'key'     => 'event_name',
-				'default' => 'vzflty_click',
 			)
 		);
 
@@ -791,57 +765,6 @@ if ( array_key_exists( 'apointoo_enabled', $input ) ) {
 	}
 
 	/**
-	 * Register the GTM tab fields.
-	 *
-	 * @return void
-	 */
-	private function register_gtm_section() {
-		$page_id = $this->get_section_page_id( 'gtm' );
-
-		add_settings_section(
-			'vzflty_settings_gtm',
-			__( 'Google Tag Manager', 'floaty-book-now-chat' ),
-			array( $this, 'render_gtm_section_description' ),
-			$page_id
-		);
-
-		add_settings_field(
-			'gtm_enabled',
-			__( 'Enable GTM DataLayer', 'floaty-book-now-chat' ),
-			array( $this, 'render_checkbox_field' ),
-			$page_id,
-			'vzflty_settings_gtm',
-			array(
-				'key' => 'gtm_enabled',
-			)
-		);
-
-		add_settings_field(
-			'gtm_event_name',
-			__( 'Event name', 'floaty-book-now-chat' ),
-			array( $this, 'render_text_field' ),
-			$page_id,
-			'vzflty_settings_gtm',
-			array(
-				'key'         => 'gtm_event_name',
-				'default'     => 'vzflty_click',
-				'description' => __( 'Custom event name pushed to dataLayer on button click.', 'floaty-book-now-chat' ),
-			)
-		);
-	}
-
-	/**
-	 * Render GTM section description.
-	 *
-	 * @return void
-	 */
-	public function render_gtm_section_description() {
-		?>
-		<p><?php esc_html_e( 'Push button clicks to Google Tag Manager dataLayer for tracking in GA4, Google Ads, and other analytics tools.', 'floaty-book-now-chat' ); ?></p>
-		<?php
-	}
-
-	/**
 	 * Render a checkbox field.
 	 *
 	 * @param array $args Field args.
@@ -981,6 +904,7 @@ if ( array_key_exists( 'apointoo_enabled', $input ) ) {
 				esc_html__( 'Status:', 'floaty-book-now-chat' ),
 				esc_html( $status_label )
 			);
+			echo wp_kses_post( $this->get_clicktrail_contextual_copy() );
 
 			if ( 'whatsapp' === $mode ) {
 				printf(
@@ -1033,6 +957,40 @@ if ( array_key_exists( 'apointoo_enabled', $input ) ) {
 				}
 			}
 		}
+
+		if ( 'lead_capture' === $active_tab ) {
+			echo wp_kses_post( $this->get_clicktrail_contextual_copy() );
+		}
+	}
+
+	/**
+	 * Build contextual ClickTrail compatibility copy.
+	 *
+	 * @return string
+	 */
+	private function get_clicktrail_contextual_copy() {
+		$url = 'https://wordpress.org/plugins/click-trail-handler/';
+
+		return wp_kses(
+			sprintf(
+				'<p class="description">%s</p>',
+				sprintf(
+					/* translators: %s: ClickTrail plugin URL. */
+					__( 'Floaty handles the CTA and booking button layer. If you also need attribution and analytics for CTA clicks or leads, pair it with <a href="%s" target="_blank" rel="noopener noreferrer">ClickTrail</a>.', 'floaty-book-now-chat' ),
+					esc_url( $url )
+				)
+			),
+			array(
+				'p' => array(
+					'class' => array(),
+				),
+				'a' => array(
+					'href'   => array(),
+					'target' => array(),
+					'rel'    => array(),
+				),
+			)
+		);
 	}
 
 	/**
@@ -1102,10 +1060,6 @@ if ( array_key_exists( 'apointoo_enabled', $input ) ) {
 			'lead_capture' => array(
 				'slug'  => 'lead_capture',
 				'label' => __( 'Lead Capture', 'floaty-book-now-chat' ),
-			),
-			'gtm'      => array(
-				'slug'  => 'gtm',
-				'label' => __( 'GTM / Analytics', 'floaty-book-now-chat' ),
 			),
 		);
 	}

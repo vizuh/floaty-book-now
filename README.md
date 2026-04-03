@@ -17,11 +17,12 @@ Choose one primary mode:
 
 ## Key features
 - Floating CTA on every page (bottom-left / bottom-right)
-- Modes: **WhatsApp** or **Custom**
+- Modes: **WhatsApp**, **Custom**, or **Lead Capture**
 - Actions (Custom mode): **Open link** or **Iframe modal**
+- Lead capture form with redirect to WhatsApp or a custom link
 - Lightweight styles + **Custom CSS** overrides
-- dataLayer click event for GTM/GA4 tracking (default: `floaty_click`)
 - WordPress best practices: capability checks + sanitized settings
+- Works well alongside ClickTrail when you want attribution and analytics
 
 ---
 
@@ -37,8 +38,8 @@ Choose one primary mode:
 - Enable plugin
 - Button label
 - Position
-- Mode (WhatsApp or Custom)
-- dataLayer event name
+- Mode (WhatsApp, Custom, or Lead Capture)
+- Device and page targeting rules
 
 ### WhatsApp
 - Phone number (international digits only)
@@ -50,6 +51,10 @@ Choose one primary mode:
 - Iframe URL
 - Custom CSS
 
+### Lead Capture
+- Name, email, and phone field toggles
+- Redirect to WhatsApp or a custom link after submit
+
 ### Apointoo Booking
 - Enable Apointoo integration
 - Merchant ID  
@@ -59,16 +64,8 @@ Choose one primary mode:
 
 ---
 
-## dataLayer event
-On click, Floaty pushes this to `window.dataLayer` (if available):
-
-```js
-{
-  event: "floaty_click",
-  floatyActionType: "link" | "iframe_modal" | "whatsapp",
-  floatyLabel: "Book now"
-}
-```
+## ClickTrail Compatibility
+Floaty focuses on the CTA/button layer. If you also need attribution and analytics for CTA clicks or leads, pair it with [ClickTrail](https://wordpress.org/plugins/click-trail-handler/).
 
 ## Development
 

@@ -93,17 +93,15 @@ class VZFLTY_Lead_Controller extends WP_REST_Controller {
 		}
 
 		// Prepare Data.
-		$utm_params = $request->get_param( 'utm' );
-		$utm_json   = ! empty( $utm_params ) ? wp_json_encode( $utm_params ) : '{}';
+		$wpp_number = sanitize_text_field( $request->get_param( 'wpp_number' ) );
 
 		$data = array(
 			'lead_name'             => $name,
 			'lead_email'            => $email,
 			'lead_phone'            => $phone,
 			'lead_normalized_phone' => $phone, // Normalize later if needed.
-			'utm_data'              => $utm_json,
+			'wpp_number'            => $wpp_number,
 			'status'                => 'new',
-			'source_url'            => esc_url_raw( $request->get_param( 'source_url' ) ),
 		);
 
 		// Insert into DB.
@@ -150,16 +148,11 @@ class VZFLTY_Lead_Controller extends WP_REST_Controller {
 				'required'          => false,
 				'sanitize_callback' => 'sanitize_text_field',
 			),
-			'utm' => array(
-				'description' => __( 'UTM Parameters', 'floaty-book-now-chat' ),
-				'type'        => 'object',
-				'required'    => false,
-			),
-			'source_url' => array(
-				'description' => __( 'Source URL', 'floaty-book-now-chat' ),
-				'type'        => 'string',
-				'required'    => false,
-				'sanitize_callback' => 'esc_url_raw',
+			'wpp_number' => array(
+				'description'       => __( 'WhatsApp destination number', 'floaty-book-now-chat' ),
+				'type'              => 'string',
+				'required'          => false,
+				'sanitize_callback' => 'sanitize_text_field',
 			),
 		);
 	}

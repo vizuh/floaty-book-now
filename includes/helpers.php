@@ -25,7 +25,6 @@ function vzflty_get_default_options() {
 		'link_url'              => '',
 		'link_target'           => '_blank',
 		'iframe_url'            => '',
-		'event_name'            => 'vzflty_click',
 		'custom_css'            => '',
 		'whatsapp_phone'        => '',
 		'whatsapp_message'      => '',
@@ -37,9 +36,6 @@ function vzflty_get_default_options() {
 		// Page targeting.
 		'page_targeting'        => 'all', // 'all', 'homepage', 'specific'.
 		'target_pages'          => array(),
-		// GTM DataLayer.
-		'gtm_enabled'           => 0,
-		'gtm_event_name'        => 'vzflty_click',
 	);
 }
 

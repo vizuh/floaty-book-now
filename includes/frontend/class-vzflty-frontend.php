@@ -100,7 +100,6 @@ class VZFLTY_Frontend {
 			'linkUrl'         => vzflty_get_option_value( $options, 'link_url', '' ),
 			'linkTarget'      => vzflty_get_option_value( $options, 'link_target', '_blank' ),
 			'iframeUrl'       => vzflty_get_option_value( $options, 'iframe_url', '' ),
-			'eventName'       => vzflty_get_option_value( $options, 'event_name', 'vzflty_click' ),
 			'whatsappPhone'   => vzflty_get_option_value( $options, 'whatsapp_phone', '' ),
 			'whatsappMessage' => vzflty_get_option_value( $options, 'whatsapp_message', '' ),
 			// Lead Capture & API.
@@ -117,10 +116,6 @@ class VZFLTY_Frontend {
 			'apointoo'        => array(
 				'enabled'    => (bool) vzflty_get_option_value( $options, 'apointoo_enabled', 0 ),
 				'merchantId' => vzflty_get_option_value( $options, 'apointoo_merchant_id', '' ),
-			),
-			'gtm'             => array(
-				'enabled'   => (bool) vzflty_get_option_value( $options, 'gtm_enabled', 0 ),
-				'eventName' => vzflty_get_option_value( $options, 'gtm_event_name', 'vzflty_click' ),
 			),
 			'i18n'            => array(
 				'defaultButtonLabel'   => __( 'Book now', 'floaty-book-now-chat' ),
@@ -151,26 +146,22 @@ class VZFLTY_Frontend {
 			return false;
 		}
 
-		$mode               = $this->resolve_mode( $options );
-		$action             = isset( $options['action_type'] ) ? $options['action_type'] : 'link';
-		$has_whatsapp_phone = ! empty( $options['whatsapp_phone'] );
+		$mode   = $this->resolve_mode( $options );
+		$action = isset( $options['action_type'] ) ? $options['action_type'] : 'link';
 
-		if ( 'whatsapp' === $mode ) {
-			return $has_whatsapp_phone;
-		}
-
-		if ( 'lead_capture' === $mode ) {
-			// For Lead Capture, we assume it's valid if enabled, 
-			// though we might want to check if fields are enabled or redirect is valid.
-			// For now, return true.
-			return true;
-		}
-
-		if ( 'link' === $action && empty( $options['link_url'] ) ) {
+		if ( 'whatsapp' === $mode && empty( $options['whatsapp_phone'] ) ) {
 			return false;
 		}
 
-		if ( 'iframe_modal' === $action && empty( $options['iframe_url'] ) ) {
+		if ( 'custom' === $mode && 'link' === $action && empty( $options['link_url'] ) ) {
+			return false;
+		}
+
+		if ( 'custom' === $mode && 'iframe_modal' === $action && empty( $options['iframe_url'] ) ) {
+			return false;
+		}
+
+		if ( 'lead_capture' === $mode && ! $this->has_lead_capture_entrypoint( $options ) ) {
 			return false;
 		}
 
@@ -209,6 +200,35 @@ class VZFLTY_Frontend {
 		}
 
 		return true;
+	}
+
+	/**
+	 * Check whether lead capture has a meaningful entrypoint.
+	 *
+	 * @param array $options Options array.
+	 *
+	 * @return bool
+	 */
+	private function has_lead_capture_entrypoint( $options ) {
+		$has_enabled_field = ! empty( $options['lc_field_name_enabled'] )
+			|| ! empty( $options['lc_field_email_enabled'] )
+			|| ! empty( $options['lc_field_phone_enabled'] );
+
+		if ( $has_enabled_field ) {
+			return true;
+		}
+
+		$redirect_type = isset( $options['lc_redirect_type'] ) ? $options['lc_redirect_type'] : 'whatsapp';
+
+		if ( 'whatsapp' === $redirect_type ) {
+			return ! empty( $options['whatsapp_phone'] );
+		}
+
+		if ( 'link' === $redirect_type ) {
+			return ! empty( $options['link_url'] );
+		}
+
+		return false;
 	}
 
 	/**

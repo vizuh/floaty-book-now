@@ -52,10 +52,6 @@ class VZFLTY_Leads_List_Table extends WP_List_Table {
 			'created_at' => __( 'Date', 'floaty-book-now-chat' ),
 			'name'       => __( 'Name', 'floaty-book-now-chat' ),
 			'contact'    => __( 'Contact', 'floaty-book-now-chat' ),
-			'source'     => __( 'Source / Medium', 'floaty-book-now-chat' ),
-			'campaign'   => __( 'Campaign', 'floaty-book-now-chat' ),
-			'click_ids'  => __( 'Click IDs', 'floaty-book-now-chat' ),
-			'landing'    => __( 'Landing Page', 'floaty-book-now-chat' ),
 			'wpp_number' => __( 'WhatsApp', 'floaty-book-now-chat' ),
 			'status'     => __( 'Status', 'floaty-book-now-chat' ),
 		);
@@ -120,59 +116,6 @@ class VZFLTY_Leads_List_Table extends WP_List_Table {
 		$phone = $item->lead_phone ? esc_html( $item->lead_phone ) : '-';
 		$email = $item->lead_email ? esc_html( $item->lead_email ) : '-';
 		return sprintf( '<div>%s</div><div><small>%s</small></div>', $phone, $email );
-	}
-
-	/**
-	 * Render source column.
-	 *
-	 * @param object $item Row item.
-	 *
-	 * @return string
-	 */
-	protected function column_source( $item ) {
-		$s = $item->utm_source ?: '-';
-		$m = $item->utm_medium ?: '-';
-		return esc_html( "$s / $m" );
-	}
-
-	/**
-	 * Render campaign column.
-	 *
-	 * @param object $item Row item.
-	 *
-	 * @return string
-	 */
-	protected function column_campaign( $item ) {
-		return esc_html( $item->utm_campaign ?: '-' );
-	}
-
-	/**
-	 * Render click IDs column.
-	 *
-	 * @param object $item Row item.
-	 *
-	 * @return string
-	 */
-	protected function column_click_ids( $item ) {
-		if ( empty( $item->click_ids ) ) {
-			return '-';
-		}
-		// Display as compact string or badges
-		return '<small>' . esc_html( substr( $item->click_ids, 0, 50 ) ) . ( strlen( $item->click_ids ) > 50 ? '...' : '' ) . '</small>';
-	}
-
-	/**
-	 * Render landing page column.
-	 *
-	 * @param object $item Row item.
-	 *
-	 * @return string
-	 */
-	protected function column_landing( $item ) {
-		if ( empty( $item->landing_page ) ) {
-			return '-';
-		}
-		return sprintf( '<a href="%1$s" target="_blank" title="%1$s">...%2$s</a>', esc_url( $item->landing_page ), esc_html( substr( $item->landing_page, -20 ) ) );
 	}
 
 	/**
