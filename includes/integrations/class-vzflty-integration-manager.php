@@ -9,37 +9,16 @@ if ( ! defined( 'ABSPATH' ) ) {
 	exit;
 }
 
-require_once __DIR__ . '/class-vzflty-zoho-integration.php';
-
 /**
  * Manages active integrations and dispatches leads.
  */
 class VZFLTY_Integration_Manager {
 
 	/**
-	 * Registered integration instances keyed by slug.
-	 *
-	 * @var array
-	 */
-	private $integrations = array();
-
-	public function __construct() {
-		// Constructor left empty or used for property initialization if needed.
-	}
-
-	/**
 	 * Initialize Manager.
 	 */
 	public function init() {
-		$this->register_integrations();
 		add_action( 'vzflty_lead_created', array( $this, 'dispatch_lead' ), 10, 2 );
-	}
-
-	/**
-	 * Register available integrations.
-	 */
-	private function register_integrations() {
-		$this->integrations['zoho'] = new VZFLTY_Zoho_Integration();
 	}
 
 	/**
@@ -52,16 +31,7 @@ class VZFLTY_Integration_Manager {
 	 */
 	public function dispatch_lead( $lead_id, $data ) {
 		$options = vzflty_get_options();
-		
-		// Zoho
-		if ( ! empty( $options['zoho_enabled'] ) ) {
-			// We can dispatch directly or wrap in try/catch
-			if ( isset( $this->integrations['zoho'] ) ) {
-				$this->integrations['zoho']->send( $data );
-			}
-		}
 
-		// Generic Webhook
 		if ( ! empty( $options['integration_enabled'] ) && ! empty( $options['integration_webhook_url'] ) ) {
 			$this->send_webhook( $lead_id, $data, $options['integration_webhook_url'] );
 		}
@@ -94,8 +64,8 @@ class VZFLTY_Integration_Manager {
 		);
 
 		wp_remote_post( $url, $args );
-		
-		// Log attempt to queue (history)
+
+		// Log attempt to queue (history).
 		$db = new VZFLTY_DB();
 		$db->add_to_queue( $lead_id, 'webhook', $payload );
 	}

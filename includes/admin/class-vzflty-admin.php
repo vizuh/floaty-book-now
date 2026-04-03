@@ -235,6 +235,16 @@ class VZFLTY_Admin {
 		$current_values = vzflty_get_options();
 		$output         = $current_values;
 		$mode           = $this->resolve_mode( $current_values );
+		$legacy_keys    = array(
+			'zoho_enabled',
+			'zoho_action_url',
+			'zoho_xnQsjsdp',
+			'zoho_xmIwtLD',
+		);
+
+		foreach ( $legacy_keys as $legacy_key ) {
+			unset( $output[ $legacy_key ] );
+		}
 
 		if ( array_key_exists( 'mode', $input ) ) {
 			$mode = in_array( $input['mode'], array( 'whatsapp', 'custom', 'lead_capture' ), true ) ? $input['mode'] : $mode;
@@ -339,20 +349,6 @@ if ( array_key_exists( 'apointoo_enabled', $input ) ) {
 			$output['lc_redirect_type'] = in_array( $input['lc_redirect_type'], array( 'whatsapp', 'link' ), true ) ? $input['lc_redirect_type'] : 'whatsapp';
 		}
 		
-		// Zoho Fields.
-		if ( array_key_exists( 'zoho_enabled', $input ) ) {
-			$output['zoho_enabled'] = ! empty( $input['zoho_enabled'] ) ? 1 : 0;
-		}
-		if ( array_key_exists( 'zoho_action_url', $input ) ) {
-			$output['zoho_action_url'] = esc_url_raw( $input['zoho_action_url'] );
-		}
-		if ( array_key_exists( 'zoho_xnQsjsdp', $input ) ) {
-			$output['zoho_xnQsjsdp'] = sanitize_text_field( $input['zoho_xnQsjsdp'] );
-		}
-		if ( array_key_exists( 'zoho_xmIwtLD', $input ) ) {
-			$output['zoho_xmIwtLD'] = sanitize_text_field( $input['zoho_xmIwtLD'] );
-		}
-
 		// Language Tokens.
 		$i18n_keys = array(
 			'i18n_form_title',
@@ -644,7 +640,7 @@ if ( array_key_exists( 'apointoo_enabled', $input ) ) {
 			'vzflty_settings_custom',
 			array(
 				'key'         => 'custom_css',
-				'description' => __( 'Scope your rules with #floaty-button-container to avoid theme conflicts.', 'floaty-book-now-chat' ),
+				'description' => __( 'Scope your rules with #vzflty-button-container to avoid theme conflicts.', 'floaty-book-now-chat' ),
 			)
 		);
 	}
@@ -792,58 +788,6 @@ if ( array_key_exists( 'apointoo_enabled', $input ) ) {
 			)
 		);
 
-		// Integrations Section
-		add_settings_section(
-			'vzflty_settings_lc_integrations',
-			__( 'Integrations (Zoho)', 'floaty-book-now-chat' ),
-			null,
-			$page_id
-		);
-
-		add_settings_field(
-			'zoho_enabled',
-			__( 'Enable Zoho WebTwLead', 'floaty-book-now-chat' ),
-			array( $this, 'render_checkbox_field' ),
-			$page_id,
-			'vzflty_settings_lc_integrations',
-			array(
-				'key' => 'zoho_enabled',
-			)
-		);
-
-		add_settings_field(
-			'zoho_action_url',
-			__( 'Action URL', 'floaty-book-now-chat' ),
-			array( $this, 'render_text_field' ),
-			$page_id,
-			'vzflty_settings_lc_integrations',
-			array(
-				'key' => 'zoho_action_url',
-				'description' => 'https://crm.zoho.com/crm/WebToLeadForm'
-			)
-		);
-
-		add_settings_field(
-			'zoho_xnQsjsdp',
-			__( 'Token: xnQsjsdp', 'floaty-book-now-chat' ),
-			array( $this, 'render_text_field' ),
-			$page_id,
-			'vzflty_settings_lc_integrations',
-			array(
-				'key' => 'zoho_xnQsjsdp',
-			)
-		);
-
-		add_settings_field(
-			'zoho_xmIwtLD',
-			__( 'Token: xmIwtLD', 'floaty-book-now-chat' ),
-			array( $this, 'render_text_field' ),
-			$page_id,
-			'vzflty_settings_lc_integrations',
-			array(
-				'key' => 'zoho_xmIwtLD',
-			)
-		);
 	}
 
 	/**
